@@ -3,6 +3,7 @@
 ;; Copyright (C) 2023  Free Software Foundation, Inc.
 
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
+;; Maintainer: Protesilaos Stavrou <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/dired-preview
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
 ;; Version: 0.1.1
@@ -57,6 +58,7 @@
 ;;; Code:
 
 (require 'dired)
+(require 'seq)
 
 (defgroup dired-preview nil
   "Automatically preview file at point in Dired."
@@ -74,7 +76,7 @@
 (defcustom dired-preview-max-size (expt 2 20)
   "Files larger than this byte limit are not previewed."
   :group 'dired-preview
-  :type 'integer)
+  :type 'natnum)
 
 (defcustom dired-preview-display-action-alist-function
   #'dired-preview-display-action-alist-dwim
@@ -90,19 +92,14 @@ details."
 (defcustom dired-preview-delay 0.7
   "Time in seconds to wait before previewing."
   :group 'dired-preview
-  :type 'float)
+  :type 'number)
 
 (defvar dired-preview--buffers nil
   "List with buffers of previewed files.")
 
 (defun dired-preview--get-buffers ()
   "Return buffers that show previews."
-  (seq-filter
-   (lambda (buffer)
-     (when (and (bufferp buffer)
-                (buffer-live-p buffer))
-       buffer))
-   dired-preview--buffers))
+  (seq-filter #'buffer-live-p dired-preview--buffers))
 
 (defun dired-preview--window-parameter-p (window)
   "Return non-nil if WINDOW has `dired-preview-window' parameter."
@@ -132,8 +129,8 @@ until it drops below this number.")
     (catch 'stop
       (mapc
        (lambda (buffer)
-         (if (and (>= (dired-preview--get-buffer-cumulative-size)
-                      dired-preview--buffers-threshold))
+         (if (>= (dired-preview--get-buffer-cumulative-size)
+                 dired-preview--buffers-threshold)
              (when (and (buffer-local-value 'delayed-mode-hooks buffer)
                         (not (eq buffer (current-buffer))))
                (ignore-errors (kill-buffer-if-not-modified buffer))
@@ -167,8 +164,8 @@ See user option `dired-preview-ignored-extensions-regexp'."
 
 (defun dired-preview--file-displayed-p (file)
   "Return non-nil if FILE is already displayed in a window."
-  (when-let* ((buffer (get-file-buffer file))
-              (window (get-buffer-window buffer)))
+  (when-let ((buffer (get-file-buffer file))
+             (window (get-buffer-window buffer)))
     (window-live-p window)))
 
 (defun dired-preview--set-window-parameters (window value)
@@ -235,9 +232,9 @@ checked against `split-width-threshold' or
 
 (defun dired-preview-display-action-side ()
   "Pick a side window that is appropriate for the given frame."
-  (if-let* ((width (window-body-width))
-            ((>= width (window-body-height)))
-            ((>= width split-width-threshold)))
+  (if-let ((width (window-body-width))
+           ((>= width (window-body-height)))
+           ((>= width split-width-threshold)))
       `(:side right :dimension window-width :size ,(dired-preview-get-window-size :width))
     `(:side bottom :dimension window-height :size ,(dired-preview-get-window-size :height))))
 
@@ -304,9 +301,9 @@ With optional NO-DELAY do not start a timer.  Otherwise produce
 the preview with `dired-preview-delay' of idleness."
   (add-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)
   (dired-preview--cancel-timer)
-  (if-let* ((file (dired-file-name-at-point))
-            ((dired-preview--preview-p file))
-            ((memq this-command dired-preview-trigger-commands)))
+  (if-let ((file (dired-file-name-at-point))
+           ((dired-preview--preview-p file))
+           ((memq this-command dired-preview-trigger-commands)))
       (if no-delay
           (dired-preview-display-file file)
         (setq dired-preview--timer
@@ -320,14 +317,14 @@ the preview with `dired-preview-delay' of idleness."
 (defun dired-preview-disable-preview ()
   "Disable Dired preview."
   (unless (eq major-mode 'dired-mode)
-    (error "Can only use `dired-preview' in Dired"))
+    (user-error "Can only use `dired-preview' in Dired"))
   (remove-hook 'post-command-hook #'dired-preview-trigger :local)
   (dired-preview--close-previews))
 
 (defun dired-preview-enable-preview ()
   "Enable Dired preview."
   (unless (eq major-mode 'dired-mode)
-    (error "Can only use `dired-preview' in Dired"))
+    (user-error "Can only use `dired-preview' in Dired"))
   (add-hook 'post-command-hook #'dired-preview-trigger nil :local)
   (dired-preview-trigger :no-delay))
 
