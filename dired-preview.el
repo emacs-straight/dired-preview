@@ -59,6 +59,8 @@
 
 (require 'dired)
 (require 'seq)
+(eval-when-compile
+  (require 'subr-x))
 
 (defgroup dired-preview nil
   "Automatically preview file at point in Dired."
@@ -69,33 +71,41 @@
           "\\(mkv\\|webm\\|mp4\\|mp3\\|ogg\\|m4a"
           "\\|gz\\|zst\\|tar\\|xz\\|rar\\|zip"
           "\\|iso\\|epub\\|pdf\\)")
-  "Regular expression of file type extensions to not preview."
+  "Regular expression of file type extensions to not preview.
+When the value is nil, do not ignore any file: preview
+everything."
   :group 'dired-preview
-  :type 'string)
+  :type '(choice (const :tag "Do not ignore any file (preview everything)" nil)
+                 (string :tag "Ignore files matching regular expression")))
 
 (defcustom dired-preview-max-size (expt 2 20)
   "Files larger than this byte limit are not previewed."
   :group 'dired-preview
   :type 'natnum)
 
-(defcustom dired-preview-display-action-alist-function
-  #'dired-preview-display-action-alist-dwim
-  "Function to return the `display-buffer' action for the preview.
-This is the same data that is passed to `display-buffer-alist'.
-Read Info node `(elisp) Displaying Buffers'.  As such, it is
-meant for experienced users.  See the reference function
-`dired-preview-display-action-alist-dwim' for the implementation
-details."
-  :group 'dired-preview
-  :type 'function)
-
 (defcustom dired-preview-delay 0.7
   "Time in seconds to wait before previewing."
   :group 'dired-preview
   :type 'number)
 
+(defcustom dired-preview-chunk-size 10240
+  "Size in bytes to read from large files."
+  :group 'dired-preview
+  :type 'natnum)
+
+(defcustom dired-preview-binary-as-hexl t
+  "Whether non-text (binary) files should be previewed in `hexl-mode'.
+
+Irrespective of this option, you can switch between raw/hexl
+views at any time using `dired-preview-hexl-toggle'."
+  :group 'dired-preview
+  :type 'boolean)
+
 (defvar dired-preview--buffers nil
   "List with buffers of previewed files.")
+
+(defvar dired-preview--large-files-alist nil
+  "Alist mapping previewed large files to buffer names.")
 
 (defun dired-preview--get-buffers ()
   "Return buffers that show previews."
@@ -139,6 +149,15 @@ until it drops below this number.")
        buffers))
     (setq dired-preview--buffers (delq nil (nreverse buffers)))))
 
+(defun dired-preview--kill-large-buffers ()
+  "Kill buffers previewing large files."
+  (mapc (lambda (pair)
+          (let ((buffer (cdr pair)))
+            (and (bufferp buffer)
+                 (kill-buffer buffer))))
+        dired-preview--large-files-alist)
+  (setq dired-preview--large-files-alist nil))
+
 (defun dired-preview--get-windows ()
   "Return windows that show previews."
   (seq-filter #'dired-preview--window-parameter-p (window-list)))
@@ -155,7 +174,8 @@ until it drops below this number.")
 (defun dired-preview--file-ignored-p (file)
   "Return non-nil if FILE extension is among the ignored extensions.
 See user option `dired-preview-ignored-extensions-regexp'."
-  (when-let ((ext (file-name-extension file)))
+  (when-let (((stringp dired-preview-ignored-extensions-regexp))
+             (ext (file-name-extension file)))
     (string-match-p ext dired-preview-ignored-extensions-regexp)))
 
 (defun dired-preview--file-large-p (file)
@@ -186,6 +206,66 @@ See user option `dired-preview-ignored-extensions-regexp'."
     (kill-local-variable 'delayed-mode-hooks)
     (remove-hook 'post-command-hook #'dired-preview--run-mode-hooks :local))))
 
+(defun dired-preview--dispatch-file (file)
+  "Decide how to preview FILE.
+
+Return the preview buffer."
+  (cond
+   ((dired-preview--file-large-p file)
+    (dired-preview--find-large-file file))
+   (t
+    (dired-preview--find-file-no-select file))))
+
+(defun dired-preview--add-truncation-message ()
+  "Add a message indicating that the previewed file is truncated."
+  (let ((end-ov (make-overlay (1- (point-max)) (point-max))))
+    (overlay-put
+     end-ov 'display
+     (propertize "\n--PREVIEW TRUNCATED--" 'face 'shadow))))
+
+(declare-function hexl-mode "hexl")
+(declare-function hexl-mode-exit "hexl" (&optional arg))
+
+(defun dired-preview--find-large-file (file)
+  "Read part of FILE with appropriate settings.
+
+The size of the leading chunk is specified by
+`dired-preview-chunk-size'."
+  (let ((inhibit-message t)
+        (enable-dir-local-variables nil)
+        (enable-local-variables :safe)
+        (non-essential t)
+        (delay-mode-hooks t))
+    (if-let* ((buffer (or (get-file-buffer file)
+                       (find-buffer-visiting file)
+                       (alist-get file dired-preview--large-files-alist
+                                  nil nil #'equal))))
+        buffer ; Buffer is already being visited, we can reuse it
+      (with-current-buffer (create-file-buffer file)
+        ;; We create a buffer with a partial preview
+        (buffer-disable-undo)
+        (insert-file-contents file nil 1 dired-preview-chunk-size 'replace)
+        (when (and (eq buffer-file-coding-system 'no-conversion)
+                   dired-preview-binary-as-hexl)
+          (hexl-mode))
+        (dired-preview--add-truncation-message)
+        (read-only-mode t)
+        ;; Because this buffer is not marked as visiting FILE, we need to keep
+        ;; track of it ourselves.
+        (setf (alist-get file dired-preview--large-files-alist
+                         nil nil 'equal)
+              (current-buffer))))))
+
+(defun dired-preview-hexl-toggle ()
+  "Toggle preview between text and `hexl-mode'."
+  (interactive)
+  (dolist (win (dired-preview--get-windows))
+    (with-selected-window win
+      (if (eq major-mode 'hexl-mode)
+          (hexl-mode-exit)
+        (hexl-mode))
+      (dired-preview--add-truncation-message))))
+
 (defun dired-preview--find-file-no-select (file)
   "Call `find-file-noselect' on FILE with appropriate settings."
   ;; NOTE: I learnt about `non-essential' and `delay-mode-hooks' from
@@ -205,7 +285,7 @@ Always return FILE buffer."
   (let ((buffer (find-buffer-visiting file)))
     (if (buffer-live-p buffer)
         buffer
-      (setq buffer (dired-preview--find-file-no-select file)))
+      (setq buffer (dired-preview--dispatch-file file)))
     (with-current-buffer buffer
       (add-hook 'post-command-hook #'dired-preview--run-mode-hooks nil :local))
     (add-to-list 'dired-preview--buffers buffer)
@@ -214,38 +294,6 @@ Always return FILE buffer."
 (defun dired-preview--get-preview-buffer (file)
   "Return buffer to preview FILE in."
   (dired-preview--add-to-previews file))
-
-(defvar dired-preview-buffer-name "*dired-preview*"
-  "Name of preview buffer.")
-
-(defun dired-preview-get-window-size (dimension)
-  "Return window size by checking for DIMENSION.
-DIMENSION is either a `:width' or `:height' keyword.  It is
-checked against `split-width-threshold' or
-`split-height-threshold'"
-  (pcase dimension
-    (:width (if-let ((window-width (floor (window-total-width) 2))
-                     ((> window-width fill-column)))
-                window-width
-              fill-column))
-    (:height (floor (window-height) 2))))
-
-(defun dired-preview-display-action-side ()
-  "Pick a side window that is appropriate for the given frame."
-  (if-let ((width (window-body-width))
-           ((>= width (window-body-height)))
-           ((>= width split-width-threshold)))
-      `(:side right :dimension window-width :size ,(dired-preview-get-window-size :width))
-    `(:side bottom :dimension window-height :size ,(dired-preview-get-window-size :height))))
-
-(defun dired-preview-display-action-alist-dwim ()
-  "Reference function for `dired-preview-display-action-alist-function'.
-Return a `display-buffer' action alist, as described in the
-aforementioned user option."
-  (let ((properties (dired-preview-display-action-side)))
-    `((display-buffer-in-side-window)
-      (side . ,(plist-get properties :side))
-      (,(plist-get properties :dimension) . ,(plist-get properties :size)))))
 
 (defvar dired-preview-trigger-commands
   '(dired-next-line dired-previous-line dired-mark dired-unmark dired-unmark-backward dired-del-marker dired-goto-file dired-find-file)
@@ -263,7 +311,8 @@ aforementioned user option."
   "Kill preview buffers and delete their windows."
   (dired-preview--cancel-timer)
   (dired-preview--delete-windows)
-  (dired-preview--kill-buffers))
+  (dired-preview--kill-buffers)
+  (dired-preview--kill-large-buffers))
 
 (defun dired-preview--close-previews-outside-dired ()
   "Call `dired-preview--close-previews' if BUFFER is not in Dired mode."
@@ -272,13 +321,10 @@ aforementioned user option."
     (remove-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)
     (put 'dired-preview-start 'function-executed nil)))
 
+;; TODO 2023-10-05: We may no longer need this function.
 (defun dired-preview--display-buffer (buffer)
-  "Call `display-buffer' for BUFFER.
-Only do it with the current major mode is Dired."
-  (display-buffer
-   buffer
-   (funcall (or dired-preview-display-action-alist-function
-                #'dired-preview-display-action-alist-dwim))))
+  "Call `display-buffer' for BUFFER."
+  (display-buffer buffer))
 
 (defun dired-preview-display-file (file)
   "Display preview of FILE if appropriate."
@@ -293,11 +339,10 @@ Only do it with the current major mode is Dired."
   (and (file-regular-p file)
        (not (file-directory-p file))
        (not (dired-preview--file-displayed-p file))
-       (not (dired-preview--file-ignored-p file))
-       (not (dired-preview--file-large-p file))))
+       (not (dired-preview--file-ignored-p file))))
 
 (defun dired-preview-start (file)
-  "Preview instantly when invoke dired"
+  "Preview FILE instantly when invoking Dired."
   (unless (get 'dired-preview-start 'function-executed)
     (put 'dired-preview-start 'function-executed t)
     (dired-preview-display-file file)))
@@ -341,9 +386,16 @@ the preview with `dired-preview-delay' of idleness."
   (add-hook 'post-command-hook #'dired-preview-trigger nil :local)
   (dired-preview-trigger :no-delay))
 
+(defvar dired-preview-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") #'dired-preview-hexl-toggle)
+    map)
+  "Key map for `dired-preview-mode'.")
+
 ;;;###autoload
 (define-minor-mode dired-preview-mode
   "Buffer-local mode to preview file at point in Dired."
+  :keymap dired-preview-mode-map
   :global nil
   (if dired-preview-mode
       (dired-preview-enable-preview)
