@@ -155,13 +155,11 @@ until it drops below this number.")
     (catch 'stop
       (mapc
        (lambda (buffer)
-         (if (>= (dired-preview--get-buffer-cumulative-size)
-                 dired-preview--buffers-threshold)
-             (when (and (buffer-local-value 'delayed-mode-hooks buffer)
-                        (not (eq buffer (current-buffer))))
-               (ignore-errors (kill-buffer-if-not-modified buffer))
-               (setq buffers (delq buffer buffers)))
-           (throw 'stop t)))
+         (when (and (>= (dired-preview--get-buffer-cumulative-size) dired-preview--buffers-threshold)
+                    (not (eq buffer (current-buffer))))
+           (ignore-errors (kill-buffer-if-not-modified buffer))
+           (setq buffers (delq buffer buffers)))
+         (throw 'stop t))
        buffers))
     (setq dired-preview--buffers (delq nil (nreverse buffers)))))
 
@@ -192,7 +190,8 @@ until it drops below this number.")
 See user option `dired-preview-ignored-extensions-regexp'."
   (when-let (((not (file-directory-p file)))
              ((stringp dired-preview-ignored-extensions-regexp))
-             (ext (file-name-extension file :include-dot)))
+             (ext (file-name-extension file :include-dot))
+             ((not (string-blank-p ext))))
     (string-match-p ext dired-preview-ignored-extensions-regexp)))
 
 (defun dired-preview--file-large-p (file)
@@ -212,16 +211,12 @@ See user option `dired-preview-ignored-extensions-regexp'."
     (set-window-parameter window 'dedicated value)
     (set-window-parameter window 'no-other-window value)))
 
-(defun dired-preview--run-mode-hooks ()
-  "Run mode hooks in current buffer, if `delayed-mode-hooks' is non-nil."
-  (cond
-   ((window-parameter (selected-window) 'dired-preview-window)
-    (dired-preview--delete-windows))
-   ((and delay-mode-hooks (current-buffer))
+(defun dired-preview--clean-up-window ()
+  "Delete or clean up preview window."
+  (if (window-parameter (selected-window) 'dired-preview-window)
+      (dired-preview--delete-windows)
     (dired-preview--set-window-parameters (selected-window) nil)
-    (apply #'run-hooks (delete-dups delayed-mode-hooks))
-    (kill-local-variable 'delayed-mode-hooks)
-    (remove-hook 'post-command-hook #'dired-preview--run-mode-hooks :local))))
+    (remove-hook 'post-command-hook #'dired-preview--clean-up-window :local)))
 
 ;; TODO 2024-04-22: Add PDF type and concomitant method to display its buffer.
 (defun dired-preview--infer-type (file)
@@ -257,8 +252,7 @@ FILE."
           (inhibit-message t)
           (enable-dir-local-variables nil)
           (enable-local-variables :safe)
-          (non-essential t)
-          (delay-mode-hooks t))
+          (non-essential t))
       (find-file-noselect file :nowarn))))
 
 (defun dired-preview--add-truncation-message ()
@@ -285,13 +279,12 @@ FILE."
   "Get preview buffer for large FILE.
 The size of the leading chunk is specified by
 `dired-preview-chunk-size'."
-  (cl-letf (((symbol-function 'recentf-track-closed-file) #'ignore))
+  (cl-letf (((symbol-function 'recentf-track-opened-file) #'ignore))
     (let ((file (cdr file))
           (inhibit-message t)
           (enable-dir-local-variables nil)
           (enable-local-variables :safe)
-          (non-essential t)
-          (delay-mode-hooks t))
+          (non-essential t))
       (if-let* ((buffer (or (get-file-buffer file)
                             (find-buffer-visiting file)
                             (alist-get file dired-preview--large-files-alist
@@ -318,13 +311,12 @@ The size of the leading chunk is specified by
 
 (cl-defmethod dired-preview--get-buffer ((file (head directory)))
   "Get preview buffer for directory FILE type."
-  (cl-letf (((symbol-function 'recentf-track-closed-file) #'ignore))
+  (cl-letf (((symbol-function 'recentf-track-opened-file) #'ignore))
     (let ((file (cdr file))
           (inhibit-message t)
           (enable-dir-local-variables nil)
           (enable-local-variables :safe)
-          (non-essential t)
-          (delay-mode-hooks t))
+          (non-essential t))
       (dired-noselect file))))
 
 ;; FIXME 2024-04-22: Best way to preview images and PDF files?  For now
@@ -332,25 +324,24 @@ The size of the leading chunk is specified by
 ;; it.
 (cl-defmethod dired-preview--get-buffer ((file (head image)))
   "Get preview buffer for image FILE type."
-  (cl-letf (((symbol-function 'recentf-track-closed-file) #'ignore))
+  (cl-letf (((symbol-function 'recentf-track-opened-file) #'ignore))
     (let ((file (cdr file))
           (inhibit-message t)
           (enable-dir-local-variables nil)
           (enable-local-variables :safe)
-          (non-essential t)
-          (delay-mode-hooks t))
+          (non-essential t))
       (find-file-noselect file :nowarn))))
 
 (defun dired-preview--add-to-previews (file)
   "Add FILE to `dired-preview--buffers', if not already in a buffer.
 Always return FILE buffer."
-  (cl-letf (((symbol-function 'recentf-track-closed-file) #'ignore))
+  (cl-letf (((symbol-function 'recentf-track-opened-file) #'ignore))
     (let ((buffer (find-buffer-visiting file)))
       (if (buffer-live-p buffer)
           buffer
         (setq buffer (dired-preview--get-buffer (dired-preview--infer-type file))))
       (with-current-buffer buffer
-        (add-hook 'post-command-hook #'dired-preview--run-mode-hooks nil :local))
+        (add-hook 'post-command-hook #'dired-preview--clean-up-window nil :local))
       (add-to-list 'dired-preview--buffers buffer)
       buffer)))
 
