@@ -5,7 +5,7 @@
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/dired-preview
-;; Version: 0.1.1
+;; Version: 0.2.0
 ;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: files, convenience
 
@@ -108,14 +108,6 @@ details."
   "Size in bytes to read from large files."
   :group 'dired-preview
   :type 'natnum)
-
-(defcustom dired-preview-binary-as-hexl t
-  "Whether non-text (binary) files should be previewed in `hexl-mode'.
-
-Irrespective of this option, you can switch between raw/hexl
-views at any time using `dired-preview-hexl-toggle'."
-  :group 'dired-preview
-  :type 'boolean)
 
 (defvar dired-preview--buffers nil
   "List with buffers of previewed files.")
@@ -236,7 +228,7 @@ FILE."
       (cons 'image file))
      ((file-directory-p file)
       (cons 'directory file))
-     ((file-writable-p file)
+     (t
       (cons 'text file)))))
 
 (cl-defgeneric dired-preview--get-buffer (file)
@@ -294,8 +286,7 @@ The size of the leading chunk is specified by
           ;; We create a buffer with a partial preview
           (buffer-disable-undo)
           (insert-file-contents file nil 1 dired-preview-chunk-size 'replace)
-          (when (and (eq buffer-file-coding-system 'no-conversion)
-                     dired-preview-binary-as-hexl)
+          (when (eq buffer-file-coding-system 'no-conversion)
             (hexl-mode))
           (dired-preview--add-truncation-message)
           (read-only-mode t)
@@ -307,7 +298,7 @@ The size of the leading chunk is specified by
 
 (cl-defmethod dired-preview--get-buffer ((file (head ignore)))
   "Get preview buffer for ignored FILE."
-    (message "No preview method for `%s'" (cdr file)))
+  (message "No preview method for `%s'" (cdr file)))
 
 (cl-defmethod dired-preview--get-buffer ((file (head directory)))
   "Get preview buffer for directory FILE type."
@@ -367,7 +358,7 @@ checked against `split-width-threshold' or
 (defun dired-preview-display-action-side ()
   "Pick a side window that is appropriate for the given frame."
   (if-let (split-width-threshold
-	   (width (window-body-width))
+           (width (window-body-width))
            ((>= width (window-body-height)))
            ((>= width split-width-threshold)))
       `(:side right :dimension window-width :size ,(dired-preview-get-window-size :width))
@@ -383,7 +374,16 @@ aforementioned user option."
       (,(plist-get properties :dimension) . ,(plist-get properties :size)))))
 
 (defvar dired-preview-trigger-commands
-  '(dired-next-line dired-previous-line dired-mark dired-unmark dired-unmark-backward dired-del-marker dired-goto-file dired-find-file)
+  '( dired-next-line
+     dired-previous-line
+     dired-mark
+     dired-unmark
+     dired-unmark-backward
+     dired-del-marker
+     dired-goto-file
+     dired-find-file
+     scroll-up-command
+     scroll-down-command)
   "List of Dired commands that trigger a preview.")
 
 (defvar dired-preview--timer nil
@@ -402,7 +402,7 @@ aforementioned user option."
   (dired-preview--kill-large-buffers))
 
 (defun dired-preview--close-previews-outside-dired ()
-  "Call `dired-preview--close-previews' if BUFFER is not in Dired mode."
+  "Call `dired-preview--close-previews' if the current buffer is not in Dired mode."
   (unless (eq major-mode 'dired-mode)
     (dired-preview--close-previews)
     (remove-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)
@@ -426,7 +426,9 @@ Only do it with the current major mode is Dired."
 
 (defun dired-preview--preview-p (file)
   "Return non-nil if FILE can be previewed."
-  (and (file-readable-p file)
+  (and file
+       (or (file-regular-p file) (file-directory-p file))
+       (file-readable-p file)
        (not (dired-preview--file-displayed-p file))
        (not (dired-preview--file-ignored-p file))))
 
@@ -442,22 +444,19 @@ With optional NO-DELAY do not start a timer.  Otherwise produce
 the preview with `dired-preview-delay' of idleness."
   (add-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)
   (dired-preview--cancel-timer)
-  (if-let ((file (dired-file-name-at-point))
-           ((dired-preview--preview-p file))
-           ((memq this-command dired-preview-trigger-commands)))
+  (let* ((file (dired-file-name-at-point))
+         (preview (dired-preview--preview-p file)))
+    (cond
+     ((and preview (memq this-command dired-preview-trigger-commands))
       (if no-delay
           (dired-preview-display-file file)
         (setq dired-preview--timer
-              (run-with-idle-timer
-               dired-preview-delay
-               nil
-               #'dired-preview-display-file
-               file)))
-    (if (and file (dired-preview--preview-p file))
-	(dired-preview-start file)
-      (if (not (memq this-command dired-preview-trigger-commands))
-	  nil
-	(dired-preview--delete-windows)))
+              (run-with-idle-timer dired-preview-delay nil #'dired-preview-display-file file))))
+     ((and file preview)
+      (dired-preview-start file))
+     ((and (not preview)
+           (memq this-command dired-preview-trigger-commands))
+      (dired-preview--delete-windows)))
     (dired-preview--close-previews-outside-dired)))
 
 (defun dired-preview-disable-preview ()

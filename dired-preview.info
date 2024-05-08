@@ -1,4 +1,4 @@
-This is docIhe6XF.info, produced by makeinfo version 6.8 from
+This is docIK52b3.info, produced by makeinfo version 6.8 from
 dired-preview.texi.
 
 Copyright (C) 2023 Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docIhe6XF.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: docIK52b3.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -44,19 +44,20 @@ functionality and customization options of ‘dired-preview’ (or
 information pertinent to it.
 
    The documentation furnished herein corresponds to stable version
-0.1.0, released on 2023-07-08.  Any reference to a newer feature which
+0.2.0, released on 2024-05-07.  Any reference to a newer feature which
 does not yet form part of the latest tagged Git commit, is explicitly
 marked as such.
 
-   Current development target is 0.2.0-dev.
+   Current development target is 0.3.0-dev.
 
    • Package name (GNU ELPA): ‘dired-preview’
    • Official manual: <https://protesilaos.com/emacs/dired-preview>
    • Git repositories:
         • GitHub: <https://github.com/protesilaos/dired-preview>
         • GitLab: <https://gitlab.com/protesilaos/dired-preview>
-   • Backronym: Directories Invariably Render Everything Decently; PDFs
-     Require Extra Viewing Instructions for Emacs to Work.
+   • Backronym: Directories Invariably Render Everything Decently ...
+     preview; dired ... PDFs Require Extra Viewing Instructions for
+     Emacs to Work.
 
 * Menu:
 
@@ -86,7 +87,7 @@ Indices
 
 
 
-File: docIhe6XF.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: docIK52b3.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -112,6 +113,9 @@ PDFs, and EPUBs.
    [ In the near future, we may find ways to quickly preview any file
 type without affecting the performance of Emacs.  ]
 
+   Large files are previewed in ‘hexl-mode’ mode.  The user can disable
+this mode by typing ‘C-c C-c’.
+
    I took inspiration for ‘dired-preview’ from the now unmaintained
 ‘peep-dired’ package by Adam Sokolnicki:
 <https://github.com/asok/peep-dired>.  My original plan was to volunteer
@@ -124,7 +128,7 @@ without upsetting existing users.
 * How to tweak the placement of the preview window::
 
 
-File: docIhe6XF.info,  Node: How to tweak the placement of the preview window,  Up: Overview
+File: docIK52b3.info,  Node: How to tweak the placement of the preview window,  Up: Overview
 
 1.1 How to tweak the placement of the preview window
 ====================================================
@@ -149,7 +153,7 @@ powerful.  As such, this user option must be treated with care as a
 false value will break things.
 
 
-File: docIhe6XF.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
+File: docIK52b3.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -160,7 +164,7 @@ File: docIhe6XF.info,  Node: Installation,  Next: Sample configuration,  Prev: O
 * Manual installation::
 
 
-File: docIhe6XF.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+File: docIK52b3.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
 
 2.1 GNU ELPA package
 ====================
@@ -179,7 +183,7 @@ archive.  Read:
 <https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
 
 
-File: docIhe6XF.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+File: docIK52b3.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
 
 2.2 Manual installation
 =======================
@@ -206,7 +210,7 @@ following commands in a shell prompt:
    Everything is in place to set up the package.
 
 
-File: docIhe6XF.info,  Node: Sample configuration,  Next: Acknowledgements,  Prev: Installation,  Up: Top
+File: docIK52b3.info,  Node: Sample configuration,  Next: Acknowledgements,  Prev: Installation,  Up: Top
 
 3 Sample configuration
 **********************
@@ -229,7 +233,7 @@ Remember to read the doc string of each of these variables or functions.
      (dired-preview-global-mode 1)
 
 
-File: docIhe6XF.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Sample configuration,  Up: Top
+File: docIK52b3.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Sample configuration,  Up: Top
 
 4 Acknowledgements
 ******************
@@ -248,7 +252,7 @@ Ideas and/or user feedback
      Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter Prevos.
 
 
-File: docIhe6XF.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
+File: docIK52b3.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 5 GNU Free Documentation License
 ********************************
@@ -730,7 +734,7 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: docIhe6XF.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
+File: docIK52b3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
 
 6 Indices
 *********
@@ -742,7 +746,7 @@ File: docIhe6XF.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up
 * Concept index::
 
 
-File: docIhe6XF.info,  Node: Function index,  Next: Variable index,  Up: Indices
+File: docIK52b3.info,  Node: Function index,  Next: Variable index,  Up: Indices
 
 6.1 Function index
 ==================
@@ -754,7 +758,7 @@ File: docIhe6XF.info,  Node: Function index,  Next: Variable index,  Up: Indices
 * dired-preview-mode:                    Overview.             (line 11)
 
 
-File: docIhe6XF.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
+File: docIK52b3.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
 
 6.2 Variable index
 ==================
@@ -769,7 +773,7 @@ File: docIhe6XF.info,  Node: Variable index,  Next: Concept index,  Prev: Functi
 * dired-preview-max-size:                Overview.             (line 15)
 
 
-File: docIhe6XF.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
+File: docIK52b3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 6.3 Concept index
 =================
@@ -785,18 +789,18 @@ File: docIhe6XF.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 Tag Table:
 Node: Top856
-Node: Overview2926
-Node: How to tweak the placement of the preview window4466
-Node: Installation5455
-Node: GNU ELPA package5642
-Node: Manual installation6210
-Node: Sample configuration7007
-Node: Acknowledgements7753
-Node: GNU Free Documentation License8293
-Node: Indices33636
-Node: Function index33812
-Node: Variable index34103
-Node: Concept index34659
+Node: Overview2953
+Node: How to tweak the placement of the preview window4605
+Node: Installation5594
+Node: GNU ELPA package5781
+Node: Manual installation6349
+Node: Sample configuration7146
+Node: Acknowledgements7892
+Node: GNU Free Documentation License8432
+Node: Indices33775
+Node: Function index33951
+Node: Variable index34242
+Node: Concept index34798
 
 End Tag Table
 
