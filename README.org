@@ -89,9 +89,13 @@ Previews are shown subject to a small delay, per ther user option
 ~dired-preview-delay~.
 
 #+vindex: dired-preview-ignored-extensions-regexp
+#+vindex: dired-preview-ignored-show-ignored-placeholders
 Files matching the ~dired-preview-ignored-extensions-regexp~ are not
-previewed.  The default value of that user option includes multimedia,
-PDFs, and EPUBs.
+previewed, though a preview window is still displayed if the user
+option ~dired-preview-ignored-show-ignored-placeholders~ is non-nil [
+the ~dired-preview-ignored-show-ignored-placeholders~ is part of
+{{{development-version}}} ]. This is to avoid windows jumping in and
+out of focus as the user moves between files.
 
 [ In the near future, we may find ways to quickly preview any file
   type without affecting the performance of Emacs. ]
@@ -222,9 +226,9 @@ matters.
 
 + Author/maintainer :: Protesilaos Stavrou.
 
-+ Contributions to code or the manual :: Bruno Boal, Christian Tietze,
-  Juergen Hoetzel, Karthik Chikmagalur, Stefan Monnier, Philip
-  Kaludercic, Nofint.
++ Contributions to code or the manual :: Álvaro Ramírez (xenodium),
+  Bruno Boal, Christian Tietze, Juergen Hoetzel, Karthik Chikmagalur,
+  Stefan Monnier, Philip Kaludercic, Nofint.
 
 + Ideas and/or user feedback :: Bruno Boal, Ed Hamilton, Karthik
   Chikmagalur, Peter Prevos.

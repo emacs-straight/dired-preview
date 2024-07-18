@@ -1,4 +1,4 @@
-This is docIK52b3.info, produced by makeinfo version 6.8 from
+This is docNWWsRl.info, produced by makeinfo version 6.8 from
 dired-preview.texi.
 
 Copyright (C) 2023 Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docIK52b3.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: docNWWsRl.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -87,7 +87,7 @@ Indices
 
 
 
-File: docIK52b3.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: docNWWsRl.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -107,8 +107,11 @@ Previews are shown subject to a small delay, per ther user option
 ‘dired-preview-delay’.
 
    Files matching the ‘dired-preview-ignored-extensions-regexp’ are not
-previewed.  The default value of that user option includes multimedia,
-PDFs, and EPUBs.
+previewed, though a preview window is still displayed if the user option
+‘dired-preview-ignored-show-ignored-placeholders’ is non-nil [ the
+‘dired-preview-ignored-show-ignored-placeholders’ is part of 0.3.0-dev
+].  This is to avoid windows jumping in and out of focus as the user
+moves between files.
 
    [ In the near future, we may find ways to quickly preview any file
 type without affecting the performance of Emacs.  ]
@@ -128,7 +131,7 @@ without upsetting existing users.
 * How to tweak the placement of the preview window::
 
 
-File: docIK52b3.info,  Node: How to tweak the placement of the preview window,  Up: Overview
+File: docNWWsRl.info,  Node: How to tweak the placement of the preview window,  Up: Overview
 
 1.1 How to tweak the placement of the preview window
 ====================================================
@@ -153,7 +156,7 @@ powerful.  As such, this user option must be treated with care as a
 false value will break things.
 
 
-File: docIK52b3.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
+File: docNWWsRl.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -164,7 +167,7 @@ File: docIK52b3.info,  Node: Installation,  Next: Sample configuration,  Prev: O
 * Manual installation::
 
 
-File: docIK52b3.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+File: docNWWsRl.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
 
 2.1 GNU ELPA package
 ====================
@@ -183,7 +186,7 @@ archive.  Read:
 <https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
 
 
-File: docIK52b3.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+File: docNWWsRl.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
 
 2.2 Manual installation
 =======================
@@ -210,7 +213,7 @@ following commands in a shell prompt:
    Everything is in place to set up the package.
 
 
-File: docIK52b3.info,  Node: Sample configuration,  Next: Acknowledgements,  Prev: Installation,  Up: Top
+File: docNWWsRl.info,  Node: Sample configuration,  Next: Acknowledgements,  Prev: Installation,  Up: Top
 
 3 Sample configuration
 **********************
@@ -233,7 +236,7 @@ Remember to read the doc string of each of these variables or functions.
      (dired-preview-global-mode 1)
 
 
-File: docIK52b3.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Sample configuration,  Up: Top
+File: docNWWsRl.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Sample configuration,  Up: Top
 
 4 Acknowledgements
 ******************
@@ -245,14 +248,15 @@ Author/maintainer
      Protesilaos Stavrou.
 
 Contributions to code or the manual
-     Bruno Boal, Christian Tietze, Juergen Hoetzel, Karthik Chikmagalur,
-     Stefan Monnier, Philip Kaludercic, Nofint.
+     Álvaro Ramírez (xenodium), Bruno Boal, Christian Tietze, Juergen
+     Hoetzel, Karthik Chikmagalur, Stefan Monnier, Philip Kaludercic,
+     Nofint.
 
 Ideas and/or user feedback
      Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter Prevos.
 
 
-File: docIK52b3.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
+File: docNWWsRl.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 5 GNU Free Documentation License
 ********************************
@@ -734,7 +738,7 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: docIK52b3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
+File: docNWWsRl.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
 
 6 Indices
 *********
@@ -746,7 +750,7 @@ File: docIK52b3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up
 * Concept index::
 
 
-File: docIK52b3.info,  Node: Function index,  Next: Variable index,  Up: Indices
+File: docNWWsRl.info,  Node: Function index,  Next: Variable index,  Up: Indices
 
 6.1 Function index
 ==================
@@ -758,7 +762,7 @@ File: docIK52b3.info,  Node: Function index,  Next: Variable index,  Up: Indices
 * dired-preview-mode:                    Overview.             (line 11)
 
 
-File: docIK52b3.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
+File: docNWWsRl.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
 
 6.2 Variable index
 ==================
@@ -770,10 +774,11 @@ File: docIK52b3.info,  Node: Variable index,  Next: Concept index,  Prev: Functi
 * dired-preview-display-action-alist-function: How to tweak the placement of the preview window.
                                                                (line  6)
 * dired-preview-ignored-extensions-regexp: Overview.           (line 20)
+* dired-preview-ignored-show-ignored-placeholders: Overview.   (line 20)
 * dired-preview-max-size:                Overview.             (line 15)
 
 
-File: docIK52b3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
+File: docNWWsRl.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 6.3 Concept index
 =================
@@ -790,17 +795,17 @@ File: docIK52b3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 Tag Table:
 Node: Top856
 Node: Overview2953
-Node: How to tweak the placement of the preview window4605
-Node: Installation5594
-Node: GNU ELPA package5781
-Node: Manual installation6349
-Node: Sample configuration7146
-Node: Acknowledgements7892
-Node: GNU Free Documentation License8432
-Node: Indices33775
-Node: Function index33951
-Node: Variable index34242
-Node: Concept index34798
+Node: How to tweak the placement of the preview window4826
+Node: Installation5815
+Node: GNU ELPA package6002
+Node: Manual installation6570
+Node: Sample configuration7367
+Node: Acknowledgements8113
+Node: GNU Free Documentation License8687
+Node: Indices34030
+Node: Function index34206
+Node: Variable index34497
+Node: Concept index35126
 
 End Tag Table
 
