@@ -134,10 +134,6 @@ details."
   "Return buffers that show previews."
   (seq-filter #'buffer-live-p dired-preview--buffers))
 
-(defun dired-preview--window-parameter-p (window)
-  "Return non-nil if WINDOW has `dired-preview-window' parameter."
-  (window-parameter window 'dired-preview-window))
-
 ;; TODO 2023-07-07: This can become a user option, but let's keep it
 ;; simple for now.  We need to be sure this is always doing the right
 ;; thing.
@@ -189,6 +185,10 @@ until it drops below this number.")
                           (ignore-errors (kill-buffer buffer))
                           t)))
                     (dired-preview--get-buffers))))
+
+(defun dired-preview--window-parameter-p (window)
+  "Return non-nil if WINDOW has `dired-preview-window' parameter."
+  (window-parameter window 'dired-preview-window))
 
 (defun dired-preview--get-windows ()
   "Return windows that show previews."
@@ -281,18 +281,35 @@ FILE."
      end-ov 'display
      (propertize "\n--PREVIEW TRUNCATED--" 'face 'shadow))))
 
+;;;###autoload
+(defmacro dired-preview-with-window (&rest body)
+  "Evaluate BODY with the Dired preview window as selected."
+  `(dolist (win (dired-preview--get-windows))
+     (with-selected-window win
+       ,@body)))
+
+(defun dired-preview-visit ()
+  "Visit the currently previewed buffer.
+This means that the buffer is no longer among the previews."
+  (interactive)
+  (let (file buffer)
+    (dired-preview-with-window
+     (setq file buffer-file-name)
+     (dired-preview--close-previews-outside-dired)
+     (setq buffer (find-file-noselect file)))
+    (pop-to-buffer buffer)))
+
 (declare-function hexl-mode "hexl")
 (declare-function hexl-mode-exit "hexl" (&optional arg))
 
 (defun dired-preview-hexl-toggle ()
   "Toggle preview between text and `hexl-mode'."
   (interactive)
-  (dolist (win (dired-preview--get-windows))
-    (with-selected-window win
-      (if (eq major-mode 'hexl-mode)
-          (hexl-mode-exit)
-        (hexl-mode))
-      (dired-preview--add-truncation-message))))
+  (dired-preview-with-window
+   (if (eq major-mode 'hexl-mode)
+       (hexl-mode-exit)
+     (hexl-mode)
+     (dired-preview--add-truncation-message))))
 
 (cl-defmethod dired-preview--get-buffer ((file (head large)))
   "Get preview buffer for large FILE.
@@ -413,6 +430,7 @@ aforementioned user option."
 (defvar dired-preview-trigger-commands
   '( dired-next-line
      dired-previous-line
+     dired-flag-file-deletion
      dired-mark
      dired-unmark
      dired-unmark-backward
@@ -516,6 +534,7 @@ the preview with `dired-preview-delay' of idleness."
 (defvar dired-preview-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-c") #'dired-preview-hexl-toggle)
+    (define-key map (kbd "C-c C-o") #'dired-preview-visit)
     map)
   "Key map for `dired-preview-mode'.")
 
