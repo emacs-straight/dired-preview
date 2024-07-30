@@ -1,4 +1,4 @@
-This is doccyqhaH.info, produced by makeinfo version 6.8 from
+This is docYBXEFx.info, produced by makeinfo version 6.8 from
 dired-preview.texi.
 
 Copyright (C) 2023 Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: doccyqhaH.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: docYBXEFx.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -73,6 +73,7 @@ marked as such.
 
 Overview
 
+* The commands available in the preview window::
 * How to tweak the placement of the preview window::
 
 Installation
@@ -93,7 +94,7 @@ Indices
 
 
 
-File: doccyqhaH.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: docYBXEFx.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -134,12 +135,46 @@ without upsetting existing users.
 
 * Menu:
 
+* The commands available in the preview window::
 * How to tweak the placement of the preview window::
 
 
-File: doccyqhaH.info,  Node: How to tweak the placement of the preview window,  Up: Overview
+File: docYBXEFx.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
 
-1.1 How to tweak the placement of the preview window
+1.1 The commands available in the preview window
+================================================
+
+[ Most of the commands or variables mentioned here are part of
+0.3.0-dev.  ]
+
+   The ‘dired-preview-mode’ and its global variant activate the
+‘dired-preview-mode-map’.  This key map binds the following commands:
+
+‘dired-preview-find-file’
+     Visit the currently previewed buffer with ‘find-file’.  This means
+     that the buffer is no longer among the previews.
+
+‘dired-preview-open-dwim’
+     Do-What-I-Mean open the currently previewed file.  This means that
+     the buffer is no longer among the previews.  If the file name
+     matches ‘dired-preview-media-extensions-regexp’,
+     ‘dired-preview-ignored-extensions-regexp’, or
+     ‘dired-preview-image-extensions-regexp’, then open it externally.
+     Otherwise, visit the file in an Emacs buffer.
+
+‘dired-preview-page-up’
+     Perform a “page up” motion in the preview window.
+
+‘dired-preview-page-down’
+     Perform a “page down” motion in the preview window.
+
+‘dired-preview-hexl-toggle’
+     Toggle preview between text and ‘hexl-mode’.
+
+
+File: docYBXEFx.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
+
+1.2 How to tweak the placement of the preview window
 ====================================================
 
 The user option ‘dired-preview-display-action-alist-function’ speficies
@@ -162,7 +197,7 @@ powerful.  As such, this user option must be treated with care as a
 false value will break things.
 
 
-File: doccyqhaH.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
+File: docYBXEFx.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -173,7 +208,7 @@ File: doccyqhaH.info,  Node: Installation,  Next: Sample configuration,  Prev: O
 * Manual installation::
 
 
-File: doccyqhaH.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+File: docYBXEFx.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
 
 2.1 GNU ELPA package
 ====================
@@ -192,7 +227,7 @@ archive.  Read:
 <https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
 
 
-File: doccyqhaH.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+File: docYBXEFx.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
 
 2.2 Manual installation
 =======================
@@ -219,7 +254,7 @@ following commands in a shell prompt:
    Everything is in place to set up the package.
 
 
-File: doccyqhaH.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
+File: docYBXEFx.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
 
 3 Sample configuration
 **********************
@@ -240,7 +275,7 @@ Remember to read the doc string of each of these variables or functions.
                      "rar\\|"
                      "zip\\|"
                      "iso\\|"
-                     "epub\\|"
+                     "epub"
                      "\\)"))
 
      ;; Enable `dired-preview-mode' in a given Dired buffer or do it
@@ -248,7 +283,7 @@ Remember to read the doc string of each of these variables or functions.
      (dired-preview-global-mode 1)
 
 
-File: doccyqhaH.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
+File: docYBXEFx.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
 
 4 Do-It-Yourself extensions
 ***************************
@@ -262,7 +297,7 @@ In this section we include sample code to help users further configure
 * Combine dired-preview with ready-player::
 
 
-File: doccyqhaH.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
+File: docYBXEFx.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
 
 4.1 The ‘dired-preview-with-window’ macro
 =========================================
@@ -271,13 +306,14 @@ File: doccyqhaH.info,  Node: The dired-preview-with-window macro,  Next: Combine
 
    The Lisp macro ‘dired-preview-with-window’ can be used in custom
 functions to evaluate its ‘BODY’ with the Dired Preview window as the
-selected one.  Use this to perform some action on the preview window’s
-buffer.
+selected one.  It is what commands provided by Dired Preview also use
+(*note The commands available in the preview window::).  Use this to
+perform some action in the preview window’s buffer.
 
    *note Combine dired-preview with ready-player::
 
 
-File: doccyqhaH.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
+File: docYBXEFx.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
 
 4.2 Combine ‘dired-preview’ with ‘ready-player’
 ===============================================
@@ -296,17 +332,29 @@ buffer (*note The dired-preview-with-window macro::).  Here is a sample:
      (defun prot/ready-player-dired-preview-play-toggle ()
        "Call `ready-player-toggle-play-stop' on the currently previewed media file."
        (interactive)
-       (if-let ((file (dired-file-name-at-point))
-                (media (concat "\\." (regexp-opt ready-player-supported-media t) "\\'"))
-                (_ (string-match-p media file)))
-           (dired-preview-with-window
-            (call-interactively #'ready-player-toggle-play-stop))
-         (user-error "Cannot do something useful with `ready-player' here")))
+       (dired-preview-with-window
+        (if-let ((file buffer-file-name)
+                 (media (concat "\\." (regexp-opt ready-player-supported-media t) "\\'"))
+                 (_ (string-match-p media file)))
+            (call-interactively #'ready-player-toggle-play-stop)
+          (user-error "Cannot do something useful with `ready-player' here"))))
 
      (define-key dired-preview-mode-map (kbd "C-c C-p") #'prot/ready-player-dired-preview-play-toggle)
 
+   Same idea, but open the file externally no matter what:
+
+     (defun prot/ready-player-dired-preview-open-externally ()
+       "Call `ready-player-open-externally' on the currently previewed media file."
+       (interactive)
+       (dired-preview-with-window
+        (if-let ((file buffer-file-name)
+                 (media (concat "\\." (regexp-opt ready-player-supported-media t) "\\'"))
+                 (_ (string-match-p media file)))
+            (call-interactively #'ready-player-open-externally)
+          (user-error "Cannot do something useful with `ready-player' here"))))
+
 
-File: doccyqhaH.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
+File: docYBXEFx.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
 
 5 Acknowledgements
 ******************
@@ -326,7 +374,7 @@ Ideas and/or user feedback
      Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter Prevos.
 
 
-File: doccyqhaH.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
+File: docYBXEFx.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 6 GNU Free Documentation License
 ********************************
@@ -808,7 +856,7 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: doccyqhaH.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
+File: docYBXEFx.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
 
 7 Indices
 *********
@@ -820,7 +868,7 @@ File: doccyqhaH.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up
 * Concept index::
 
 
-File: doccyqhaH.info,  Node: Function index,  Next: Variable index,  Up: Indices
+File: docYBXEFx.info,  Node: Function index,  Next: Variable index,  Up: Indices
 
 7.1 Function index
 ==================
@@ -828,13 +876,23 @@ File: doccyqhaH.info,  Node: Function index,  Next: Variable index,  Up: Indices
  [index ]
 * Menu:
 
+* dired-preview-find-file:               The commands available in the preview window.
+                                                               (line 12)
 * dired-preview-global-mode:             Overview.             (line 11)
+* dired-preview-hexl-toggle:             The commands available in the preview window.
+                                                               (line 30)
 * dired-preview-mode:                    Overview.             (line 11)
+* dired-preview-open-dwim:               The commands available in the preview window.
+                                                               (line 16)
+* dired-preview-page-down:               The commands available in the preview window.
+                                                               (line 27)
+* dired-preview-page-up:                 The commands available in the preview window.
+                                                               (line 24)
 * dired-preview-with-window:             The dired-preview-with-window macro.
                                                                (line  8)
 
 
-File: doccyqhaH.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
+File: docYBXEFx.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
 
 7.2 Variable index
 ==================
@@ -847,10 +905,14 @@ File: doccyqhaH.info,  Node: Variable index,  Next: Concept index,  Prev: Functi
                                                                (line  6)
 * dired-preview-ignored-extensions-regexp: Overview.           (line 20)
 * dired-preview-ignored-show-ignored-placeholders: Overview.   (line 20)
+* dired-preview-image-extensions-regexp: The commands available in the preview window.
+                                                               (line 16)
 * dired-preview-max-size:                Overview.             (line 15)
+* dired-preview-media-extensions-regexp: The commands available in the preview window.
+                                                               (line 16)
 
 
-File: doccyqhaH.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
+File: docYBXEFx.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 7.3 Concept index
 =================
@@ -866,21 +928,22 @@ File: doccyqhaH.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 Tag Table:
 Node: Top856
-Node: Overview3095
-Node: How to tweak the placement of the preview window4968
-Node: Installation5957
-Node: GNU ELPA package6144
-Node: Manual installation6712
-Node: Sample configuration7509
-Node: Do-It-Yourself extensions8376
-Node: The dired-preview-with-window macro8762
-Node: Combine dired-preview with ready-player9312
-Node: Acknowledgements10811
-Node: GNU Free Documentation License11390
-Node: Indices36733
-Node: Function index36909
-Node: Variable index37351
-Node: Concept index37980
+Node: Overview3144
+Node: The commands available in the preview window5066
+Node: How to tweak the placement of the preview window6372
+Node: Installation7414
+Node: GNU ELPA package7601
+Node: Manual installation8169
+Node: Sample configuration8966
+Node: Do-It-Yourself extensions9830
+Node: The dired-preview-with-window macro10216
+Node: Combine dired-preview with ready-player10878
+Node: Acknowledgements12955
+Node: GNU Free Documentation License13534
+Node: Indices38877
+Node: Function index39053
+Node: Variable index40295
+Node: Concept index41244
 
 End Tag Table
 

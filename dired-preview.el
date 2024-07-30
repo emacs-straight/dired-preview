@@ -284,20 +284,99 @@ FILE."
 ;;;###autoload
 (defmacro dired-preview-with-window (&rest body)
   "Evaluate BODY with the Dired preview window as selected."
+  (declare (indent 0))
   `(dolist (win (dired-preview--get-windows))
      (with-selected-window win
        ,@body)))
 
-(defun dired-preview-visit ()
-  "Visit the currently previewed buffer.
-This means that the buffer is no longer among the previews."
+(defun dired-preview-find-file ()
+  "Visit the currently previewed buffer with `find-file'.
+This means that the buffer is no longer among the previews.
+
+Also see `dired-preview-open-dwim'."
   (interactive)
   (let (file buffer)
     (dired-preview-with-window
-     (setq file buffer-file-name)
-     (dired-preview--close-previews-outside-dired)
-     (setq buffer (find-file-noselect file)))
+      (setq file buffer-file-name)
+      (dired-preview--close-previews-outside-dired)
+      (setq buffer (find-file-noselect file)))
     (pop-to-buffer buffer)))
+
+(defvar dired-preview-media-extensions-regexp
+  "\\.\\(mp3\\|m4a\\|flac\\|mp4\\|ogg\\|mpv\\|webm\\|mov\\|wav\\)"
+  "Regular expression matching media file extensions.")
+
+(declare-function w32-shell-execute "w32fns.c")
+
+;; NOTE 2024-07-29: Adapted from the `dired-do-open' found in Emacs 31.0.50.
+(defun dired-preview--open-externally (file)
+  "Run appropriate command to open FILE externally."
+  (if-let ((command (cond
+                     ((executable-find "xdg-open")
+                      "xdg-open")
+                     ((memq system-type '(gnu/linux darwin))
+                      "open")
+                     ((memq system-type '(windows-nt ms-dos))
+                      "start")
+                     ((eq system-type 'cygwin)
+                      "cygstart")
+                     ((executable-find "run-mailcap")
+                      "run-mailcap"))))
+      (cond
+       ((memq system-type '(gnu/linux))
+        (call-process command nil 0 nil file))
+       ((memq system-type '(ms-dos))
+        (shell-command (concat command " " (shell-quote-argument file))))
+       ((memq system-type '(windows-nt))
+        (w32-shell-execute command (convert-standard-filename file)))
+       ((memq system-type '(cygwin))
+        (call-process command nil nil nil file))
+       ((memq system-type '(darwin))
+        (start-process (concat command " " file) nil command file)))
+    (error "Cannot find a command to open `%s' externally" file)))
+
+(defun dired-preview-open-dwim ()
+  "Do-What-I-Mean open the currently previewed file.
+This means that the buffer is no longer among the previews.
+
+If the file name matches `dired-preview-media-extensions-regexp',
+`dired-preview-ignored-extensions-regexp', or
+`dired-preview-image-extensions-regexp', then open it externally.
+Otherwise, visit the file in an Emacs buffer.
+
+Also see `dired-preview-find-file'."
+  (interactive)
+  (let (buffer)
+    (dired-preview-with-window
+      (when-let ((file buffer-file-name))
+        (cond
+         ((or (string-match-p dired-preview-media-extensions-regexp file)
+              (string-match-p dired-preview-ignored-extensions-regexp file)
+              (string-match-p dired-preview-image-extensions-regexp file))
+          (dired-preview--open-externally file))
+         (t
+          (dired-preview--close-previews-outside-dired)
+          (setq buffer (find-file-noselect file))))))
+    (when buffer
+      (pop-to-buffer buffer))))
+
+;; NOTE 2024-07-29: "Scroll up/down" confuses me in this context
+;; because the motion is in the opposite direction.  So "page up/down"
+;; is fine, based on what the keys of the same name do.
+(defun dired-preview-page-down ()
+  "Move a page down in the preview window.
+This technically runs `scroll-up-command'."
+  (interactive)
+  (dired-preview-with-window
+    (call-interactively 'scroll-up-command)))
+
+;; Same as above for the terminology.
+(defun dired-preview-page-up ()
+  "Move a page up in the preview window.
+This technically runs `scroll-down-command'."
+  (interactive)
+  (dired-preview-with-window
+    (call-interactively 'scroll-down-command)))
 
 (declare-function hexl-mode "hexl")
 (declare-function hexl-mode-exit "hexl" (&optional arg))
@@ -306,10 +385,10 @@ This means that the buffer is no longer among the previews."
   "Toggle preview between text and `hexl-mode'."
   (interactive)
   (dired-preview-with-window
-   (if (eq major-mode 'hexl-mode)
-       (hexl-mode-exit)
-     (hexl-mode)
-     (dired-preview--add-truncation-message))))
+    (if (eq major-mode 'hexl-mode)
+        (hexl-mode-exit)
+      (hexl-mode)
+      (dired-preview--add-truncation-message))))
 
 (cl-defmethod dired-preview--get-buffer ((file (head large)))
   "Get preview buffer for large FILE.
@@ -534,7 +613,10 @@ the preview with `dired-preview-delay' of idleness."
 (defvar dired-preview-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-c") #'dired-preview-hexl-toggle)
-    (define-key map (kbd "C-c C-o") #'dired-preview-visit)
+    (define-key map (kbd "C-c C-f") #'dired-preview-find-file)
+    (define-key map (kbd "C-c C-o") #'dired-preview-open-dwim)
+    (define-key map (kbd "C-c C-u") #'dired-preview-page-up)
+    (define-key map (kbd "C-c C-d") #'dired-preview-page-down)
     map)
   "Key map for `dired-preview-mode'.")
 
