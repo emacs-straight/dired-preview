@@ -209,7 +209,7 @@ implementation details."
   (let ((length (length buffers)))
     (catch 'enough
       (dolist (buffer buffers)
-        (if (> length max-length)
+        (if (>= length max-length)
             (when (not (eq buffer (current-buffer)))
               (ignore-errors (kill-buffer-if-not-modified buffer))
               (setq length (1- length))
@@ -288,7 +288,7 @@ See user option `dired-preview-ignored-extensions-regexp'."
 
 (defun dired-preview--file-large-p (file)
   "Return non-nil if FILE exceeds `dired-preview-max-size'."
-  (> (file-attribute-size (file-attributes file)) dired-preview-max-size))
+  (>= (file-attribute-size (file-attributes file)) dired-preview-max-size))
 
 (defun dired-preview--file-displayed-p (file)
   "Return non-nil if FILE is already displayed in a window."
@@ -524,19 +524,20 @@ The size of the leading chunk is specified by
    (find-file-noselect file :nowarn)))
 
 (defun dired-preview--add-to-previews (file)
-  "Add FILE buffer to `dired-preview--buffers', if not already in a buffer.
+  "Add FILE to `dired-preview--buffers', if not already in a buffer.
 Before adding to the list of preview buffers, make sure to clean up the
 list to be of maximum `dired-preview-max-preview-buffers' length.
 
-Always return FILE buffer."
+Return FILE buffer or nil."
   (cl-letf (((symbol-function 'recentf-track-opened-file) #'ignore))
     (let ((buffer (find-buffer-visiting file)))
-      (unless (buffer-live-p buffer)
-        (setq buffer (dired-preview--get-buffer (dired-preview--infer-type file)))
-        (with-current-buffer buffer
-          (add-hook 'post-command-hook #'dired-preview--clean-up-window nil :local))
-        (dired-preview--kill-buffers)
-        (add-to-list 'dired-preview--buffers buffer))
+      (if (buffer-live-p buffer)
+          buffer
+        (setq buffer (dired-preview--get-buffer (dired-preview--infer-type file))))
+      (dired-preview--kill-buffers)
+      (with-current-buffer buffer
+        (add-hook 'post-command-hook #'dired-preview--clean-up-window nil :local))
+      (add-to-list 'dired-preview--buffers buffer)
       buffer)))
 
 (defun dired-preview--get-preview-buffer (file)
@@ -553,7 +554,7 @@ checked against `split-width-threshold' or
 `split-height-threshold'"
   (pcase dimension
     (:width (if-let* ((window-width (floor (window-total-width) 2))
-                      ((> window-width fill-column)))
+                      ((>= window-width fill-column)))
                 window-width
               fill-column))
     (:height (floor (window-height) 2))))
