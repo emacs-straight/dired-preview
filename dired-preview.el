@@ -198,9 +198,9 @@ implementation details."
   (catch 'enough
     (dolist (buffer buffers)
       (if (>= (dired-preview--get-buffer-cumulative-size buffers) max-combined-size)
-          (when (not (eq buffer (current-buffer)))
-            (ignore-errors (kill-buffer-if-not-modified buffer))
-            (setq buffers (delq buffer buffers)))
+          (if (eq buffer (current-buffer))
+              (setq buffers (delq buffer buffers))
+            (ignore-errors (kill-buffer-if-not-modified buffer)))
         (throw 'enough t))))
   (setq dired-preview--buffers (delq nil (nreverse buffers))))
 
@@ -210,10 +210,11 @@ implementation details."
     (catch 'enough
       (dolist (buffer buffers)
         (if (>= length max-length)
-            (when (not (eq buffer (current-buffer)))
-              (ignore-errors (kill-buffer-if-not-modified buffer))
-              (setq length (1- length))
-              (setq buffers (delq buffer buffers)))
+            (progn
+              (if (eq buffer (current-buffer))
+                  (setq buffers (delq buffer buffers))
+                (ignore-errors (kill-buffer-if-not-modified buffer)))
+              (setq length (1- length)))
           (throw 'enough t)))))
   (setq dired-preview--buffers (delq nil (nreverse buffers))))
 
@@ -221,15 +222,15 @@ implementation details."
   "Kill all BUFFERS except the current one."
   (dolist (buffer buffers)
     (when (not (eq buffer (current-buffer)))
-      (ignore-errors (kill-buffer-if-not-modified buffer))
-      (setq buffers (delq buffer buffers)))
-    (setq dired-preview--buffers (delq nil (nreverse buffers)))))
+      (ignore-errors (kill-buffer-if-not-modified buffer)))
+    (setq buffers (delq buffer buffers)))
+  (setq dired-preview--buffers (delq nil (nreverse buffers))))
 
 (defun dired-preview--kill-buffers (&optional kill-all)
   "Implement `dired-preview-kill-buffers-method'.
 With optional KILL-ALL, kill all buffers regardless of the
 aforementioned user option."
-  (let ((buffers (nreverse (dired-preview--get-buffers))))
+  (when-let* ((buffers (nreverse (dired-preview--get-buffers))))
     (cond
      (kill-all
       (dired-preview--kill-buffers-unconditionally buffers))
@@ -242,11 +243,10 @@ aforementioned user option."
 
 (defun dired-preview--kill-large-buffers ()
   "Kill buffers previewing large files."
-  (mapc (lambda (pair)
-          (let ((buffer (cdr pair)))
-            (and (bufferp buffer)
-                 (kill-buffer buffer))))
-        dired-preview--large-files-alist)
+  (dolist (pair dired-preview--large-files-alist)
+    (let ((buffer (cdr pair)))
+      (and (bufferp buffer)
+           (kill-buffer buffer))))
   (setq dired-preview--large-files-alist nil))
 
 (defun dired-preview--kill-placeholder-buffers ()
@@ -270,12 +270,10 @@ aforementioned user option."
 
 (defun dired-preview--delete-windows ()
   "Delete preview windows."
-  (mapc
-   (lambda (window)
-     (unless (or (one-window-p)
-                 (eq window (minibuffer-window)))
-       (delete-window window)))
-   (dired-preview--get-windows)))
+  (unless (one-window-p)
+    (dolist (window (dired-preview--get-windows))
+      (unless (eq window (minibuffer-window))
+        (delete-window window)))))
 
 (defun dired-preview--file-ignored-p (file)
   "Return non-nil if FILE extension is among the ignored extensions.
@@ -525,20 +523,20 @@ The size of the leading chunk is specified by
 
 (defun dired-preview--add-to-previews (file)
   "Add FILE to `dired-preview--buffers', if not already in a buffer.
-Before adding to the list of preview buffers, make sure to clean up the
-list to be of maximum `dired-preview-max-preview-buffers' length.
-
 Return FILE buffer or nil."
   (cl-letf (((symbol-function 'recentf-track-opened-file) #'ignore))
-    (let ((buffer (find-buffer-visiting file)))
-      (if (buffer-live-p buffer)
-          buffer
-        (setq buffer (dired-preview--get-buffer (dired-preview--infer-type file))))
+    (let* ((inhibit-message t)
+           (existing-buffer (or (find-buffer-visiting file)
+                                (and (file-directory-p file)
+                                     (car (dired-buffers-for-dir file)))))
+           (new-buffer (unless existing-buffer
+                         (dired-preview--get-buffer (dired-preview--infer-type file)))))
       (dired-preview--kill-buffers)
-      (with-current-buffer buffer
-        (add-hook 'post-command-hook #'dired-preview--clean-up-window nil :local))
-      (add-to-list 'dired-preview--buffers buffer)
-      buffer)))
+      (when new-buffer
+        (with-current-buffer new-buffer
+          (add-hook 'post-command-hook #'dired-preview--clean-up-window nil :local))
+        (add-to-list 'dired-preview--buffers new-buffer))
+      (or existing-buffer new-buffer))))
 
 (defun dired-preview--get-preview-buffer (file)
   "Return buffer to preview FILE in."
