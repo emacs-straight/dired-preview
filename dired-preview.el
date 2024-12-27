@@ -270,10 +270,11 @@ aforementioned user option."
 
 (defun dired-preview--delete-windows ()
   "Delete preview windows."
-  (unless (one-window-p)
-    (dolist (window (dired-preview--get-windows))
-      (unless (eq window (minibuffer-window))
-        (delete-window window)))))
+  (dolist (window (dired-preview--get-windows))
+    (when (and (not (one-window-p))
+               (window-live-p window)
+               (not (eq window (minibuffer-window))))
+      (delete-window window))))
 
 (defun dired-preview--file-ignored-p (file)
   "Return non-nil if FILE extension is among the ignored extensions.
@@ -303,10 +304,12 @@ See user option `dired-preview-ignored-extensions-regexp'."
 
 (defun dired-preview--clean-up-window ()
   "Delete or clean up preview window."
-  (let ((window (selected-window)))
+  (let* ((window (selected-window))
+         (buffer (window-buffer window)))
     (if (window-parameter window 'dired-preview-window)
         (dired-preview--delete-windows)
       (dired-preview--rename-buffer (window-buffer window) :make-public)
+      (setq dired-preview--buffers (delq buffer dired-preview--buffers))
       (dired-preview--set-window-parameters window nil)
       (remove-hook 'post-command-hook #'dired-preview--clean-up-window :local))))
 
