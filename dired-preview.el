@@ -359,7 +359,8 @@ FILE."
 
 (defun dired-preview--add-truncation-message ()
   "Add a message indicating that the previewed file is truncated."
-  (let ((end-ov (make-overlay (1- (point-max)) (point-max))))
+  (let* ((max (point-max))
+         (end-ov (make-overlay (1- max) max)))
     (overlay-put
      end-ov 'display
      (propertize "\n--PREVIEW TRUNCATED--" 'face 'shadow))))
@@ -676,17 +677,19 @@ the preview with `dired-preview-delay' of idleness."
   (dired-preview--cancel-timer)
   (let* ((file (dired-file-name-at-point))
          (preview (dired-preview--preview-p file)))
-    (cond
-     ((and preview (memq this-command dired-preview-trigger-commands))
-      (if no-delay
-          (dired-preview-display-file file)
-        (setq dired-preview--timer
-              (run-with-idle-timer dired-preview-delay nil #'dired-preview-display-file file))))
-     ((and file preview)
-      (dired-preview-start file))
-     ((and (not preview)
-           (memq this-command dired-preview-trigger-commands))
-      (dired-preview--delete-windows)))
+    (condition-case nil
+        (cond
+         ((and preview (memq this-command dired-preview-trigger-commands))
+          (if no-delay
+              (dired-preview-display-file file)
+            (setq dired-preview--timer
+                  (run-with-idle-timer dired-preview-delay nil #'dired-preview-display-file file))))
+         ((and file preview)
+          (dired-preview-start file))
+         ((and (not preview)
+               (memq this-command dired-preview-trigger-commands))
+          (dired-preview--delete-windows)))
+      ((error user-error) nil))
     (dired-preview--close-previews-outside-dired)))
 
 (defun dired-preview-disable-preview ()
@@ -708,6 +711,7 @@ the preview with `dired-preview-delay' of idleness."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-x") #'dired-preview-hexl-toggle)
     (define-key map (kbd "C-c C-f") #'dired-preview-find-file)
+    (define-key map [remap dired-find-file] #'dired-preview-find-file)
     (define-key map (kbd "C-c C-o") #'dired-preview-open-dwim)
     (define-key map (kbd "C-c C-u") #'dired-preview-page-up)
     (define-key map (kbd "C-c C-d") #'dired-preview-page-down)
