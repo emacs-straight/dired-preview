@@ -477,15 +477,17 @@ This technically runs `scroll-down-command'."
 
 (declare-function hexl-mode "hexl")
 (declare-function hexl-mode-exit "hexl" (&optional arg))
+(defvar hexl-follow-ascii)
 
 (defun dired-preview-hexl-toggle ()
   "Toggle preview between text and `hexl-mode'."
   (interactive)
   (dired-preview-with-window
-    (if (eq major-mode 'hexl-mode)
-        (hexl-mode-exit)
-      (hexl-mode)
-      (dired-preview--add-truncation-message))))
+    (let ((hexl-follow-ascii nil))
+      (if (eq major-mode 'hexl-mode)
+          (hexl-mode-exit)
+        (hexl-mode 1)))
+    (dired-preview--add-truncation-message)))
 
 (cl-defmethod dired-preview--get-buffer ((file (head large)))
   "Get preview buffer for large FILE.
@@ -494,28 +496,25 @@ The size of the leading chunk is specified by
   (dired-preview-with-file-setup
    (if-let* ((buffer (or (get-file-buffer file)
                          (find-buffer-visiting file)
-                         (alist-get file dired-preview--large-files-alist
-                                    nil nil #'equal))))
+                         (alist-get file dired-preview--large-files-alist nil nil #'equal))))
        buffer ; Buffer is already being visited, we can reuse it
      (with-current-buffer (create-file-buffer file)
        ;; We create a buffer with a partial preview
        (buffer-disable-undo)
        (insert-file-contents file nil 1 dired-preview-chunk-size 'replace)
        (when (eq buffer-file-coding-system 'no-conversion)
-         (hexl-mode))
+         (let ((hexl-follow-ascii nil))
+           (hexl-mode 1)))
        (dired-preview--add-truncation-message)
        (read-only-mode t)
        ;; Because this buffer is not marked as visiting FILE, we need to keep
        ;; track of it ourselves.
-       (setf (alist-get file dired-preview--large-files-alist
-                        nil nil 'equal)
-             (current-buffer))))))
+       (setf (alist-get file dired-preview--large-files-alist nil nil 'equal) (current-buffer))))))
 
 (cl-defmethod dired-preview--get-buffer ((file (head ignore)))
   "Get preview placeholder buffer for an ignored FILE."
   (let* ((file (cdr file))
-         (buffer-name (format "%s (no preview)"
-                              (file-name-nondirectory file))))
+         (buffer-name (format "%s (no preview)" (file-name-nondirectory file))))
     (or (get-buffer buffer-name)
         (with-current-buffer (get-buffer-create buffer-name)
           (set-visited-file-name file t)
@@ -685,9 +684,21 @@ With optional MAKE-PUBLIC, remove the indicator."
     (when-let* ((window (get-buffer-window buffer)))
       (dired-preview--set-window-parameters window t))))
 
+(defvar dired-preview-encryption-file-extensions '(".gpg" ".age")
+  "List of strings specifying file extensions for encryption.")
+
+(defun dired-preview--file-encrypted-p (file)
+  "Return non-nil if FILE is encrypted.
+More specifically, test if FILE has an extension among the
+`dired-preview-encryption-file-extensions'."
+  (when-let* ((extension (file-name-extension file :include-period)))
+    (member extension dired-preview-encryption-file-extensions)))
+
 (defun dired-preview--preview-p (file)
   "Return non-nil if FILE can be previewed."
   (and file
+       (not (string-match-p "/\\./" file))
+       (not (dired-preview--file-encrypted-p file))
        (or (file-regular-p file) (file-directory-p file))
        (file-readable-p file)
        (not (dired-preview--file-displayed-p file))
