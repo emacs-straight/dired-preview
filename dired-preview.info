@@ -1,4 +1,4 @@
-This is docvVn78p.info, produced by makeinfo version 6.8 from
+This is docqiLST9.info, produced by makeinfo version 6.8 from
 dired-preview.texi.
 
 Copyright (C) 2023-2025 Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docvVn78p.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: docqiLST9.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -94,7 +94,7 @@ Indices
 
 
 
-File: docvVn78p.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: docqiLST9.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -148,7 +148,7 @@ without upsetting existing users.
 * How to tweak the placement of the preview window::
 
 
-File: docvVn78p.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
+File: docqiLST9.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
 
 1.1 The commands available in the preview window
 ================================================
@@ -178,7 +178,7 @@ The ‘dired-preview-mode’ and its global variant activate the
      Toggle preview between text and ‘hexl-mode’.
 
 
-File: docvVn78p.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
+File: docqiLST9.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
 
 1.2 How to tweak the placement of the preview window
 ====================================================
@@ -218,7 +218,7 @@ users’ needs:
      ‘dired-preview-display-action-alist-below’ is part of 0.4.0-dev.  ]
 
 
-File: docvVn78p.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
+File: docqiLST9.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -229,7 +229,7 @@ File: docvVn78p.info,  Node: Installation,  Next: Sample configuration,  Prev: O
 * Manual installation::
 
 
-File: docvVn78p.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+File: docqiLST9.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
 
 2.1 GNU ELPA package
 ====================
@@ -248,7 +248,7 @@ archive.  Read:
 <https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
 
 
-File: docvVn78p.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+File: docqiLST9.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
 
 2.2 Manual installation
 =======================
@@ -275,7 +275,7 @@ following commands in a shell prompt:
    Everything is in place to set up the package.
 
 
-File: docvVn78p.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
+File: docqiLST9.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
 
 3 Sample configuration
 **********************
@@ -304,7 +304,7 @@ Remember to read the doc string of each of these variables or functions.
      (dired-preview-global-mode 1)
 
 
-File: docvVn78p.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
+File: docqiLST9.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
 
 4 Do-It-Yourself extensions
 ***************************
@@ -318,7 +318,7 @@ In this section we include sample code to help users further configure
 * Combine dired-preview with ready-player::
 
 
-File: docvVn78p.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
+File: docqiLST9.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
 
 4.1 The ‘dired-preview-with-window’ macro
 =========================================
@@ -332,7 +332,7 @@ perform some action in the preview window’s buffer.
    *note Combine dired-preview with ready-player::
 
 
-File: docvVn78p.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
+File: docqiLST9.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
 
 4.2 Combine ‘dired-preview’ with ‘ready-player’
 ===============================================
@@ -373,7 +373,7 @@ buffer (*note The dired-preview-with-window macro::).  Here is a sample:
           (user-error "Cannot do something useful with `ready-player' here"))))
 
 
-File: docvVn78p.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
+File: docqiLST9.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
 
 5 Acknowledgements
 ******************
@@ -394,7 +394,7 @@ Ideas and/or user feedback
      Diaz-Uriarte, artelse, Inkbottle007.
 
 
-File: docvVn78p.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
+File: docqiLST9.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 6 GNU Free Documentation License
 ********************************
@@ -876,7 +876,7 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: docvVn78p.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
+File: docqiLST9.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
 
 7 Indices
 *********
@@ -888,7 +888,7 @@ File: docvVn78p.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up
 * Concept index::
 
 
-File: docvVn78p.info,  Node: Function index,  Next: Variable index,  Up: Indices
+File: docqiLST9.info,  Node: Function index,  Next: Variable index,  Up: Indices
 
 7.1 Function index
 ==================
@@ -916,7 +916,7 @@ File: docvVn78p.info,  Node: Function index,  Next: Variable index,  Up: Indices
                                                                (line  6)
 
 
-File: docvVn78p.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
+File: docqiLST9.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
 
 7.2 Variable index
 ==================
@@ -938,7 +938,7 @@ File: docvVn78p.info,  Node: Variable index,  Next: Concept index,  Prev: Functi
                                                                (line 13)
 
 
-File: docvVn78p.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
+File: docqiLST9.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 7.3 Concept index
 =================
