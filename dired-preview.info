@@ -1,4 +1,4 @@
-This is docYv5Cf3.info, produced by makeinfo version 6.8 from
+This is docx64ME3.info, produced by makeinfo version 6.8 from
 dired-preview.texi.
 
 Copyright (C) 2023-2025 Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docYv5Cf3.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: docx64ME3.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -94,7 +94,7 @@ Indices
 
 
 
-File: docYv5Cf3.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: docx64ME3.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -111,7 +111,9 @@ regular up/down motions.  Those will trigger the preview.
    The previewed file is displayed in a side window if its size is below
 the number specified in the user option ‘dired-preview-max-size’.
 Previews are shown subject to a small delay, per ther user option
-‘dired-preview-delay’.
+‘dired-preview-delay’: if the value of the delay is 0, then it is
+internally understood as 0.1 as no delay can affect performance.  [ The
+special treatment of the 0 value is part of 0.5.0-dev.  ]
 
    Files matching the ‘dired-preview-ignored-extensions-regexp’ are not
 previewed, though a preview window is still displayed if the user option
@@ -148,7 +150,7 @@ without upsetting existing users.
 * How to tweak the placement of the preview window::
 
 
-File: docYv5Cf3.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
+File: docx64ME3.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
 
 1.1 The commands available in the preview window
 ================================================
@@ -178,7 +180,7 @@ The ‘dired-preview-mode’ and its global variant activate the
      Toggle preview between text and ‘hexl-mode’.
 
 
-File: docYv5Cf3.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
+File: docx64ME3.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
 
 1.2 How to tweak the placement of the preview window
 ====================================================
@@ -217,7 +219,7 @@ users’ needs:
      window’s height to 0.3 times the height of the frame.
 
 
-File: docYv5Cf3.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
+File: docx64ME3.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -228,7 +230,7 @@ File: docYv5Cf3.info,  Node: Installation,  Next: Sample configuration,  Prev: O
 * Manual installation::
 
 
-File: docYv5Cf3.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+File: docx64ME3.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
 
 2.1 GNU ELPA package
 ====================
@@ -247,7 +249,7 @@ archive.  Read:
 <https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
 
 
-File: docYv5Cf3.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+File: docx64ME3.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
 
 2.2 Manual installation
 =======================
@@ -274,7 +276,7 @@ following commands in a shell prompt:
    Everything is in place to set up the package.
 
 
-File: docYv5Cf3.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
+File: docx64ME3.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
 
 3 Sample configuration
 **********************
@@ -303,7 +305,7 @@ Remember to read the doc string of each of these variables or functions.
      (dired-preview-global-mode 1)
 
 
-File: docYv5Cf3.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
+File: docx64ME3.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
 
 4 Do-It-Yourself extensions
 ***************************
@@ -317,7 +319,7 @@ In this section we include sample code to help users further configure
 * Combine dired-preview with ready-player::
 
 
-File: docYv5Cf3.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
+File: docx64ME3.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
 
 4.1 The ‘dired-preview-with-window’ macro
 =========================================
@@ -331,7 +333,7 @@ perform some action in the preview window’s buffer.
    *note Combine dired-preview with ready-player::
 
 
-File: docYv5Cf3.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
+File: docx64ME3.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
 
 4.2 Combine ‘dired-preview’ with ‘ready-player’
 ===============================================
@@ -372,7 +374,7 @@ buffer (*note The dired-preview-with-window macro::).  Here is a sample:
           (user-error "Cannot do something useful with `ready-player' here"))))
 
 
-File: docYv5Cf3.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
+File: docx64ME3.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
 
 5 Acknowledgements
 ******************
@@ -390,10 +392,10 @@ Contributions to code or the manual
 
 Ideas and/or user feedback
      Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter Prevos, Ramon
-     Diaz-Uriarte, artelse, Inkbottle007.
+     Diaz-Uriarte, Yiyu Zhou, artelse, Inkbottle00.
 
 
-File: docYv5Cf3.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
+File: docx64ME3.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 6 GNU Free Documentation License
 ********************************
@@ -875,7 +877,7 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: docYv5Cf3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
+File: docx64ME3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
 
 7 Indices
 *********
@@ -887,7 +889,7 @@ File: docYv5Cf3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up
 * Concept index::
 
 
-File: docYv5Cf3.info,  Node: Function index,  Next: Variable index,  Up: Indices
+File: docx64ME3.info,  Node: Function index,  Next: Variable index,  Up: Indices
 
 7.1 Function index
 ==================
@@ -915,7 +917,7 @@ File: docYv5Cf3.info,  Node: Function index,  Next: Variable index,  Up: Indices
                                                                (line  6)
 
 
-File: docYv5Cf3.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
+File: docx64ME3.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
 
 7.2 Variable index
 ==================
@@ -923,21 +925,21 @@ File: docYv5Cf3.info,  Node: Variable index,  Next: Concept index,  Prev: Functi
  [index ]
 * Menu:
 
-* dired-preview-buffer-name-indicator:   Overview.             (line 26)
+* dired-preview-buffer-name-indicator:   Overview.             (line 28)
 * dired-preview-delay:                   Overview.             (line 15)
 * dired-preview-display-action-alist:    How to tweak the placement of the preview window.
                                                                (line  6)
-* dired-preview-ignored-extensions-regexp: Overview.           (line 20)
-* dired-preview-ignored-show-ignored-placeholders: Overview.   (line 20)
+* dired-preview-ignored-extensions-regexp: Overview.           (line 22)
+* dired-preview-ignored-show-ignored-placeholders: Overview.   (line 22)
 * dired-preview-image-extensions-regexp: The commands available in the preview window.
                                                                (line 13)
-* dired-preview-kill-buffers-method:     Overview.             (line 30)
+* dired-preview-kill-buffers-method:     Overview.             (line 32)
 * dired-preview-max-size:                Overview.             (line 15)
 * dired-preview-media-extensions-regexp: The commands available in the preview window.
                                                                (line 13)
 
 
-File: docYv5Cf3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
+File: docx64ME3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 7.3 Concept index
 =================
@@ -954,21 +956,21 @@ File: docYv5Cf3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 Tag Table:
 Node: Top861
 Node: Overview3154
-Node: The commands available in the preview window5476
-Node: How to tweak the placement of the preview window6701
-Node: Installation8433
-Node: GNU ELPA package8620
-Node: Manual installation9188
-Node: Sample configuration9985
-Node: Do-It-Yourself extensions10849
-Node: The dired-preview-with-window macro11235
-Node: Combine dired-preview with ready-player11861
-Node: Acknowledgements13938
-Node: GNU Free Documentation License14565
-Node: Indices39908
-Node: Function index40084
-Node: Variable index41659
-Node: Concept index42748
+Node: The commands available in the preview window5649
+Node: How to tweak the placement of the preview window6874
+Node: Installation8606
+Node: GNU ELPA package8793
+Node: Manual installation9361
+Node: Sample configuration10158
+Node: Do-It-Yourself extensions11022
+Node: The dired-preview-with-window macro11408
+Node: Combine dired-preview with ready-player12034
+Node: Acknowledgements14111
+Node: GNU Free Documentation License14748
+Node: Indices40091
+Node: Function index40267
+Node: Variable index41842
+Node: Concept index42931
 
 End Tag Table
 
