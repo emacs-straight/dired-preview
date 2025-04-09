@@ -284,12 +284,14 @@ aforementioned user option."
   (seq-filter #'dired-preview--window-parameter-p (window-list)))
 
 (defun dired-preview--delete-windows ()
-  "Delete preview windows."
+  "Delete preview windows or clean them up if they should not be deleted."
   (dolist (window (dired-preview--get-windows))
-    (when (and (not (one-window-p))
+    (if (and (not (one-window-p))
                (window-live-p window)
-               (not (eq window (minibuffer-window))))
-      (delete-window window))))
+               (not (eq window (minibuffer-window)))
+               (not (window-prev-buffers window)))
+        (delete-window window)
+      (dired-preview--clean-up-window window))))
 
 (defun dired-preview--file-ignored-p (file)
   "Return non-nil if FILE extension is among the ignored extensions.
@@ -318,16 +320,14 @@ See user option `dired-preview-ignored-extensions-regexp'."
     (set-window-parameter window 'dedicated value)
     (set-window-parameter window 'no-other-window value)))
 
-(defun dired-preview--clean-up-window ()
-  "Delete or clean up preview window."
-  (let* ((window (selected-window))
-         (buffer (window-buffer window)))
-    (if (window-parameter window 'dired-preview-window)
-        (dired-preview--delete-windows)
-      (dired-preview--rename-buffer (window-buffer window) :make-public)
-      (setq dired-preview--buffers (delq buffer dired-preview--buffers))
-      (dired-preview--set-window-parameters window nil)
-      (remove-hook 'post-command-hook #'dired-preview--clean-up-window :local))))
+(defun dired-preview--clean-up-window (&optional window)
+  "Remove preview state from WINDOW or `selected-window'."
+  (let* ((w (or window (selected-window)))
+        (buffer (window-buffer w)))
+    (dired-preview--rename-buffer (window-buffer w) :make-public)
+    (setq dired-preview--buffers (delq buffer dired-preview--buffers))
+    (dired-preview--set-window-parameters w nil)
+    (remove-hook 'post-command-hook #'dired-preview--clean-up-window :local)))
 
 ;; TODO 2024-04-22: Add PDF type and concomitant method to display its buffer.
 (defun dired-preview--infer-type (file)
