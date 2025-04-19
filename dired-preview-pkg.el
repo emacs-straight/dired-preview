@@ -1,2 +1,2 @@
-;; Generated package description from mode: lisp-data; .el  -*- dired-previewno-byte-compile: t -*-
-(define-package "dired-preview" "0.5.0.0.20250409.85250" "Automatically preview file at point in Dired" '((emacs "28.1")) :commit "5324b4a24528ce707e12907b1079bb6b36763a33" :authors '(("Protesilaos Stavrou" . "info@protesilaos.com")) :maintainer '("Protesilaos Stavrou" . "info@protesilaos.com") :keywords '("files" "convenience") :url "https://github.com/protesilaos/dired-preview")
+;; Generated package description from dired-preview.el  -*- mode: lisp-data; no-byte-compile: t -*-
+(define-package "dired-preview" "0.5.1.0.20250418.45438" "Automatically preview file at point in Dired" '((emacs "28.1")) :commit "bfbd66d95c47c99b601c0b31d165c1e35ac5993b" :authors '(("Protesilaos Stavrou" . "info@protesilaos.com")) :maintainer '("Protesilaos Stavrou" . "info@protesilaos.com") :keywords '("files" "convenience") :url "https://github.com/protesilaos/dired-preview")
