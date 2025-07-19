@@ -5,7 +5,7 @@
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/dired-preview
-;; Version: 0.5.2
+;; Version: 0.6.0
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: files, convenience
 
@@ -189,6 +189,36 @@ can affect performance."
   "String to prepend to the name of preview buffers."
   :type 'string
   :package-version '(dired-preview . "0.4.0")
+  :group 'dired-preview)
+
+(defcustom dired-preview-trigger-on-start t
+  "When non-nil try to trigger a preview when enabling `dired-preview-mode'.
+This also means that the preview will be displayed as soon as the Dired
+buffer is visited, if `dired-preview-mode' is added to the
+`dired-mode-hook' or `dired-preview-global-mode' is enabled.
+
+If nil, then the preview happens only after one of the commands in
+`dired-preview-trigger-commands' is invoked and the mode is enabled."
+  :type 'boolean
+  :package-version '(dired-preview . "0.6.0")
+  :group 'dired-preview)
+
+(defcustom dired-preview-trigger-commands
+  '( dired-next-line
+     dired-previous-line
+     dired-flag-file-deletion
+     dired-mark
+     dired-unmark
+     dired-unmark-backward
+     dired-del-marker
+     dired-goto-file
+     dired-find-file
+     scroll-up-command
+     scroll-down-command)
+  "List of commands that trigger a preview when `dired-preview-mode' is enabled.
+Also see `dired-preview-trigger-on-start'."
+  :type '(repeat function)
+  :package-version '(dired-preview . "0.6.0")
   :group 'dired-preview)
 
 (defvar dired-preview--buffers nil
@@ -640,20 +670,6 @@ aforementioned user option."
     (dedicated . t)
     (preserve-size . (t . t))))
 
-(defvar dired-preview-trigger-commands
-  '( dired-next-line
-     dired-previous-line
-     dired-flag-file-deletion
-     dired-mark
-     dired-unmark
-     dired-unmark-backward
-     dired-del-marker
-     dired-goto-file
-     dired-find-file
-     scroll-up-command
-     scroll-down-command)
-  "List of Dired commands that trigger a preview.")
-
 (defvar dired-preview--timer nil
   "Most recent timer object to display a preview.")
 
@@ -737,9 +753,10 @@ More specifically, test if FILE has an extension among the
 
 (defun dired-preview-start (file)
   "Preview FILE instantly when invoking Dired."
-  (unless (get 'dired-preview-start 'function-executed)
-    (put 'dired-preview-start 'function-executed t)
-    (dired-preview-display-file file)))
+  (when dired-preview-trigger-on-start
+    (unless (get 'dired-preview-start 'function-executed)
+      (put 'dired-preview-start 'function-executed t)
+      (dired-preview-display-file file))))
 
 (defun dired-preview--start-idle-timer (file)
   "Start the idle timer to preview FILE."

@@ -1,4 +1,4 @@
-This is docjcLpG3.info, produced by makeinfo version 6.8 from
+This is docxvNPpU.info, produced by makeinfo version 6.8 from
 dired-preview.texi.
 
 Copyright (C) 2023-2025 Free Software Foundation, Inc.
@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docjcLpG3.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: docxvNPpU.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -44,11 +44,11 @@ functionality and customization options of ‘dired-preview’ (or
 information pertinent to it.
 
    The documentation furnished herein corresponds to stable version
-0.5.0, released on 2025-04-09.  Any reference to a newer feature which
+0.6.0, released on 2025-07-18.  Any reference to a newer feature which
 does not yet form part of the latest tagged Git commit, is explicitly
 marked as such.
 
-   Current development target is 0.6.0-dev.
+   Current development target is 0.7.0-dev.
 
    • Package name (GNU ELPA): ‘dired-preview’
    • Official manual: <https://protesilaos.com/emacs/dired-preview>
@@ -94,7 +94,7 @@ Indices
 
 
 
-File: docjcLpG3.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: docxvNPpU.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -113,6 +113,13 @@ the number specified in the user option ‘dired-preview-max-size’.
 Previews are shown subject to a small delay, per ther user option
 ‘dired-preview-delay’: if the value of the delay is 0, then it is
 internally understood as 0.1 as no delay can affect performance.
+
+   When entering a directory, a preview is triggered outright if the
+user option ‘dired-preview-trigger-on-start’ is set to a non-nil value
+(the default).
+
+   Other than entering a directory, a preview happens after one of the
+commands in ‘dired-preview-trigger-commands’ is invoked.
 
    Files matching the ‘dired-preview-ignored-extensions-regexp’ are not
 previewed, though a preview window is still displayed if the user option
@@ -149,7 +156,7 @@ without upsetting existing users.
 * How to tweak the placement of the preview window::
 
 
-File: docjcLpG3.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
+File: docxvNPpU.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
 
 1.1 The commands available in the preview window
 ================================================
@@ -179,7 +186,7 @@ The ‘dired-preview-mode’ and its global variant activate the
      Toggle preview between text and ‘hexl-mode’.
 
 
-File: docjcLpG3.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
+File: docxvNPpU.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
 
 1.2 How to tweak the placement of the preview window
 ====================================================
@@ -218,7 +225,7 @@ users’ needs:
      window’s height to 0.3 times the height of the frame.
 
 
-File: docjcLpG3.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
+File: docxvNPpU.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
 
 2 Installation
 **************
@@ -229,7 +236,7 @@ File: docjcLpG3.info,  Node: Installation,  Next: Sample configuration,  Prev: O
 * Manual installation::
 
 
-File: docjcLpG3.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+File: docxvNPpU.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
 
 2.1 GNU ELPA package
 ====================
@@ -248,7 +255,7 @@ archive.  Read:
 <https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
 
 
-File: docjcLpG3.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+File: docxvNPpU.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
 
 2.2 Manual installation
 =======================
@@ -275,7 +282,7 @@ following commands in a shell prompt:
    Everything is in place to set up the package.
 
 
-File: docjcLpG3.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
+File: docxvNPpU.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
 
 3 Sample configuration
 **********************
@@ -304,7 +311,7 @@ Remember to read the doc string of each of these variables or functions.
      (dired-preview-global-mode 1)
 
 
-File: docjcLpG3.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
+File: docxvNPpU.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
 
 4 Do-It-Yourself extensions
 ***************************
@@ -318,7 +325,7 @@ In this section we include sample code to help users further configure
 * Combine dired-preview with ready-player::
 
 
-File: docjcLpG3.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
+File: docxvNPpU.info,  Node: The dired-preview-with-window macro,  Next: Combine dired-preview with ready-player,  Up: Do-It-Yourself extensions
 
 4.1 The ‘dired-preview-with-window’ macro
 =========================================
@@ -332,7 +339,7 @@ perform some action in the preview window’s buffer.
    *note Combine dired-preview with ready-player::
 
 
-File: docjcLpG3.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
+File: docxvNPpU.info,  Node: Combine dired-preview with ready-player,  Prev: The dired-preview-with-window macro,  Up: Do-It-Yourself extensions
 
 4.2 Combine ‘dired-preview’ with ‘ready-player’
 ===============================================
@@ -373,7 +380,7 @@ buffer (*note The dired-preview-with-window macro::).  Here is a sample:
           (user-error "Cannot do something useful with `ready-player' here"))))
 
 
-File: docjcLpG3.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
+File: docxvNPpU.info,  Node: Acknowledgements,  Next: GNU Free Documentation License,  Prev: Do-It-Yourself extensions,  Up: Top
 
 5 Acknowledgements
 ******************
@@ -391,10 +398,11 @@ Contributions to code or the manual
 
 Ideas and/or user feedback
      Alex Popescu, Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter
-     Prevos, Ramon Diaz-Uriarte, Yiyu Zhou, artelse, fab6, Inkbottle00.
+     Prevos, Ramon Diaz-Uriarte, Yiyu Zhou, artelse, dasoju, fab6,
+     Inkbottle00.
 
 
-File: docjcLpG3.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
+File: docxvNPpU.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
 
 6 GNU Free Documentation License
 ********************************
@@ -876,7 +884,7 @@ software license, such as the GNU General Public License, to permit
 their use in free software.
 
 
-File: docjcLpG3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
+File: docxvNPpU.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up: Top
 
 7 Indices
 *********
@@ -888,7 +896,7 @@ File: docjcLpG3.info,  Node: Indices,  Prev: GNU Free Documentation License,  Up
 * Concept index::
 
 
-File: docjcLpG3.info,  Node: Function index,  Next: Variable index,  Up: Indices
+File: docxvNPpU.info,  Node: Function index,  Next: Variable index,  Up: Indices
 
 7.1 Function index
 ==================
@@ -916,7 +924,7 @@ File: docjcLpG3.info,  Node: Function index,  Next: Variable index,  Up: Indices
                                                                (line  6)
 
 
-File: docjcLpG3.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
+File: docxvNPpU.info,  Node: Variable index,  Next: Concept index,  Prev: Function index,  Up: Indices
 
 7.2 Variable index
 ==================
@@ -924,21 +932,23 @@ File: docjcLpG3.info,  Node: Variable index,  Next: Concept index,  Prev: Functi
  [index ]
 * Menu:
 
-* dired-preview-buffer-name-indicator:   Overview.             (line 27)
+* dired-preview-buffer-name-indicator:   Overview.             (line 34)
 * dired-preview-delay:                   Overview.             (line 15)
 * dired-preview-display-action-alist:    How to tweak the placement of the preview window.
                                                                (line  6)
-* dired-preview-ignored-extensions-regexp: Overview.           (line 21)
-* dired-preview-ignored-show-ignored-placeholders: Overview.   (line 21)
+* dired-preview-ignored-extensions-regexp: Overview.           (line 28)
+* dired-preview-ignored-show-ignored-placeholders: Overview.   (line 28)
 * dired-preview-image-extensions-regexp: The commands available in the preview window.
                                                                (line 13)
-* dired-preview-kill-buffers-method:     Overview.             (line 31)
+* dired-preview-kill-buffers-method:     Overview.             (line 38)
 * dired-preview-max-size:                Overview.             (line 15)
 * dired-preview-media-extensions-regexp: The commands available in the preview window.
                                                                (line 13)
+* dired-preview-trigger-commands:        Overview.             (line 25)
+* dired-preview-trigger-on-start:        Overview.             (line 21)
 
 
-File: docjcLpG3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
+File: docxvNPpU.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 
 7.3 Concept index
 =================
@@ -955,21 +965,21 @@ File: docjcLpG3.info,  Node: Concept index,  Prev: Variable index,  Up: Indices
 Tag Table:
 Node: Top861
 Node: Overview3154
-Node: The commands available in the preview window5584
-Node: How to tweak the placement of the preview window6809
-Node: Installation8541
-Node: GNU ELPA package8728
-Node: Manual installation9296
-Node: Sample configuration10093
-Node: Do-It-Yourself extensions10957
-Node: The dired-preview-with-window macro11343
-Node: Combine dired-preview with ready-player11969
-Node: Acknowledgements14046
-Node: GNU Free Documentation License14716
-Node: Indices40059
-Node: Function index40235
-Node: Variable index41810
-Node: Concept index42899
+Node: The commands available in the preview window5877
+Node: How to tweak the placement of the preview window7102
+Node: Installation8834
+Node: GNU ELPA package9021
+Node: Manual installation9589
+Node: Sample configuration10386
+Node: Do-It-Yourself extensions11250
+Node: The dired-preview-with-window macro11636
+Node: Combine dired-preview with ready-player12262
+Node: Acknowledgements14339
+Node: GNU Free Documentation License15022
+Node: Indices40365
+Node: Function index40541
+Node: Variable index42116
+Node: Concept index43351
 
 End Tag Table
 
