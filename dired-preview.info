@@ -286,7 +286,7 @@ File: dired-preview.info,  Node: Sample configuration,  Next: Do-It-Yourself ext
 3 Sample configuration
 **********************
 
-Remember to read the doc string of each of these variables or functions.
+Remember to read the docstring of each of these variables or functions.
 
      (require 'dired-preview)
 
@@ -969,15 +969,15 @@ Node: Installation8838
 Node: GNU ELPA package9029
 Node: Manual installation9601
 Node: Sample configuration10402
-Node: Do-It-Yourself extensions11270
-Node: The dired-preview-with-window macro11660
-Node: Combine dired-preview with ready-player12288
-Node: Acknowledgements14369
-Node: GNU Free Documentation License15056
-Node: Indices40202
-Node: Function index40382
-Node: Variable index41961
-Node: Concept index43200
+Node: Do-It-Yourself extensions11269
+Node: The dired-preview-with-window macro11659
+Node: Combine dired-preview with ready-player12287
+Node: Acknowledgements14368
+Node: GNU Free Documentation License15055
+Node: Indices40201
+Node: Function index40381
+Node: Variable index41960
+Node: Concept index43199
 
 End Tag Table
 
