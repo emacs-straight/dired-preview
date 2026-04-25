@@ -38,10 +38,9 @@ Copyright (C) 2023-2026 Free Software Foundation, Inc.
      (a) The FSF’s Back-Cover Text is: “You have the freedom to copy and
      modify this GNU manual.”
 
-   This manual, written by Protesilaos Stavrou, describes the
-functionality and customization options of ‘dired-preview’ (or
-‘dired-preview.el’) package, and provides every other piece of
-information pertinent to it.
+   This manual, written by Protesilaos, describes the functionality and
+customization options of ‘dired-preview’ (or ‘dired-preview.el’)
+package, and provides every other piece of information pertinent to it.
 
    The documentation furnished herein corresponds to stable version
 0.6.0, released on 2025-07-18.  Any reference to a newer feature which
@@ -388,7 +387,7 @@ This project is meant to be a collective effort.  Every bit of help
 matters.
 
 Author/maintainer
-     Protesilaos Stavrou.
+     Protesilaos.
 
 Contributions to code or the manual
      Álvaro Ramírez (xenodium), Bruno Boal, Christian Tietze, Juergen
@@ -962,22 +961,22 @@ File: dired-preview.info,  Node: Concept index,  Prev: Variable index,  Up: Indi
 
 Tag Table:
 Node: Top865
-Node: Overview3159
-Node: The commands available in the preview window5886
-Node: How to tweak the placement of the preview window7106
-Node: Installation8838
-Node: GNU ELPA package9029
-Node: Manual installation9601
-Node: Sample configuration10402
-Node: Do-It-Yourself extensions11269
-Node: The dired-preview-with-window macro11659
-Node: Combine dired-preview with ready-player12287
-Node: Acknowledgements14368
-Node: GNU Free Documentation License15055
-Node: Indices40201
-Node: Function index40381
-Node: Variable index41960
-Node: Concept index43199
+Node: Overview3151
+Node: The commands available in the preview window5878
+Node: How to tweak the placement of the preview window7098
+Node: Installation8830
+Node: GNU ELPA package9021
+Node: Manual installation9593
+Node: Sample configuration10394
+Node: Do-It-Yourself extensions11261
+Node: The dired-preview-with-window macro11651
+Node: Combine dired-preview with ready-player12279
+Node: Acknowledgements14360
+Node: GNU Free Documentation License15039
+Node: Indices40185
+Node: Function index40365
+Node: Variable index41944
+Node: Concept index43183
 
 End Tag Table
 
