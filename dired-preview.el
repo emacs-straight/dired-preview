@@ -398,8 +398,7 @@ FILE."
   (let* ((file (expand-file-name file))
          (file-nondir (file-name-nondirectory file)))
     (cond
-     ((and dired-preview-ignored-extensions-regexp
-           (string-match-p dired-preview-ignored-extensions-regexp file-nondir))
+     ((dired-preview--file-ignored-p file)
       (cons 'ignore file))
      ((file-directory-p file)
       (cons 'directory file))
@@ -424,11 +423,8 @@ FILE."
 (cl-defgeneric dired-preview--get-buffer (file)
   "Get a buffer for FILE.")
 
-;; FIXME 2024-04-22: We have a lot of repetitive code.  Can we expand
-;; a macro inside of a `cl-defmethod' or, alternatively, have a macro
-;; that returns the method with its implementation?
-(cl-defmethod dired-preview--get-buffer ((file (head text)))
-  "Get preview buffer for text FILE type."
+(cl-defmethod dired-preview--get-buffer (file)
+  "Get a generic preview buffer for FILE."
   (dired-preview-with-file-setup
    (find-file-noselect file :nowarn)))
 
@@ -606,11 +602,6 @@ The size of the leading chunk is specified by
 ;; FIXME 2024-04-22: Best way to preview images and PDF files?  For now
 ;; this is the same as the text file type, though we need to refine
 ;; it.
-(cl-defmethod dired-preview--get-buffer ((file (head image)))
-  "Get preview buffer for image FILE type."
-  (dired-preview-with-file-setup
-   (find-file-noselect file :nowarn)))
-
 (defun dired-preview--add-to-previews (file)
   "Add FILE to `dired-preview--buffers', if not already in a buffer.
 Return FILE buffer or nil."
@@ -700,11 +691,13 @@ aforementioned user option."
 
 (defun dired-preview--close-previews-outside-dired ()
   "Call `dired-preview--close-previews' if the current buffer is not in Dired mode.
-Do not consider the minibuffer as being another mode."
-  (unless (or (eq major-mode 'dired-mode) (minibufferp))
+Do not consider the minibuffer as being another mode.  Also do
+not close previews if the current buffer is one of them."
+  (unless (or (eq major-mode 'dired-mode)
+              (minibufferp)
+              (memq (current-buffer) dired-preview--buffers))
     (dired-preview--close-previews)
-    (remove-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)
-    (put 'dired-preview-start 'function-executed nil)))
+    (remove-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)))
 
 (defun dired-preview--display-buffer (buffer)
   "Call `display-buffer' for BUFFER.
@@ -764,13 +757,6 @@ More specifically, test if FILE has an extension among the
        (or dired-preview-ignored-show-ignored-placeholders
            (not (dired-preview--file-ignored-p file)))))
 
-(defun dired-preview-start (file)
-  "Preview FILE instantly when invoking Dired."
-  (when dired-preview-trigger-on-start
-    (unless (get 'dired-preview-start 'function-executed)
-      (put 'dired-preview-start 'function-executed t)
-      (dired-preview-display-file file))))
-
 (defun dired-preview--start-idle-timer (file)
   "Start the idle timer to preview FILE."
   (setq dired-preview--timer
@@ -782,24 +768,24 @@ More specifically, test if FILE has an extension among the
 
 (defun dired-preview-trigger (&optional no-delay)
   "Trigger display of file at point after `dired-preview-trigger-commands'.
-With optional NO-DELAY do not start a timer.  Otherwise produce
-the preview with `dired-preview-delay' of idleness."
+With optional NO-DELAY do not start a timer and do not check for
+`dired-preview-trigger-commands'.  Otherwise produce the preview
+with `dired-preview-delay' of idleness."
   (condition-case nil
-      (if (eq major-mode 'dired-mode)
+      (if (and (eq major-mode 'dired-mode)
+               (or no-delay (memq this-command dired-preview-trigger-commands)))
           (progn
             (add-hook 'window-state-change-hook #'dired-preview--close-previews-outside-dired)
             (dired-preview--cancel-timer)
             (let* ((file (dired-file-name-at-point))
                    (preview (dired-preview--preview-p file)))
               (cond
-               ((and preview (memq this-command dired-preview-trigger-commands))
-                (if no-delay
-                    (dired-preview-display-file file)
-                  (dired-preview--start-idle-timer file)))
                (preview
-                (dired-preview-start file))
-               ((and (not preview)
-                     (memq this-command dired-preview-trigger-commands))
+                (if no-delay
+                    (when dired-preview-trigger-on-start
+                      (dired-preview-display-file file))
+                  (dired-preview--start-idle-timer file)))
+               ((not preview)
                 (dired-preview--delete-windows)))))
         (dired-preview--close-previews-outside-dired))
     ((error user-error quit) nil)))
@@ -817,8 +803,7 @@ the preview with `dired-preview-delay' of idleness."
     (setq-local other-window-scroll-default nil))
   (setq-local dired-dwim-target nil)
   (remove-hook 'post-command-hook #'dired-preview-trigger :local)
-  (dired-preview--close-previews)
-  (put 'dired-preview-start 'function-executed nil))
+  (dired-preview--close-previews))
 
 (defun dired-preview-enable-preview ()
   "Enable Dired preview."
