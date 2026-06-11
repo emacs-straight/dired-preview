@@ -5,7 +5,7 @@
 ;; Author: Protesilaos <info@protesilaos.com>
 ;; Maintainer: Protesilaos <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/dired-preview
-;; Version: 0.6.0
+;; Version: 0.6.1
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: files, convenience
 
@@ -404,7 +404,8 @@ FILE."
       (cons 'directory file))
      ((dired-preview--file-large-p file)
       (cons 'large file))
-     ((string-match-p dired-preview-image-extensions-regexp file-nondir)
+     ((and (stringp dired-preview-image-extensions-regexp)
+           (string-match-p dired-preview-image-extensions-regexp file-nondir))
       (cons 'image file))
      (t
       (cons 'text file)))))
@@ -506,9 +507,12 @@ Also see `dired-preview-find-file'."
   (let ((buffer nil))
     (dired-preview-with-window
       (when-let* ((file buffer-file-name))
-        (if (or (string-match-p dired-preview-media-extensions-regexp file)
-                (string-match-p dired-preview-ignored-extensions-regexp file)
-                (string-match-p dired-preview-image-extensions-regexp file))
+        (if (or (and (stringp dired-preview-media-extensions-regexp)
+                     (string-match-p dired-preview-media-extensions-regexp file))
+                (and (stringp dired-preview-ignored-extensions-regexp)
+                     (string-match-p dired-preview-ignored-extensions-regexp file))
+                (and (stringp dired-preview-image-extensions-regexp)
+                     (string-match-p dired-preview-image-extensions-regexp file)))
             (dired-preview--open-externally file)
           (dired-preview--close-previews-outside-dired)
           (setq buffer (find-file-noselect file)))))
