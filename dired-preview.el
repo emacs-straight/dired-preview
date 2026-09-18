@@ -5,7 +5,7 @@
 ;; Author: Protesilaos <info@protesilaos.com>
 ;; Maintainer: Protesilaos <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/dired-preview
-;; Version: 0.6.1
+;; Version: 0.6.2
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: files, convenience
 
@@ -417,7 +417,10 @@ FILE."
      (let ((file (cdr file))
            (inhibit-message t)
            (enable-dir-local-variables nil)
-           (enable-local-variables :safe)
+           (enable-local-variables nil)
+           (vc-handled-backends nil)
+           (find-file-hook nil)
+           (inhibit-x-resources t)
            (non-essential t))
        ,@body)))
 
@@ -453,7 +456,8 @@ This means that the buffer is no longer among the previews.
 
 Also see `dired-preview-open-dwim'."
   (interactive)
-  (let (file buffer)
+  (let ((file nil)
+        (buffer nil))
     (dired-preview-with-window
       (setq file buffer-file-name)
       (dired-preview--close-previews-outside-dired)
@@ -493,6 +497,13 @@ Also see `dired-preview-open-dwim'."
         (start-process (concat command " " file) nil command file)))
     (error "Cannot find a command to open `%s' externally" file)))
 
+(defun dired-preview--get-large-file-from-its-buffer (buffer)
+  "Return file of BUFFER among `dired-preview--large-files-alist'."
+  (seq-find
+   (lambda (pair)
+     (eq (cdr pair) buffer))
+   dired-preview--large-files-alist))
+
 (defun dired-preview-open-dwim ()
   "Do-What-I-Mean open the currently previewed file.
 This means that the buffer is no longer among the previews.
@@ -506,7 +517,8 @@ Also see `dired-preview-find-file'."
   (interactive)
   (let ((buffer nil))
     (dired-preview-with-window
-      (when-let* ((file buffer-file-name))
+      (when-let* ((file (or buffer-file-name
+                            (dired-preview--get-large-file-from-its-buffer (current-buffer)))))
         (if (or (and (stringp dired-preview-media-extensions-regexp)
                      (string-match-p dired-preview-media-extensions-regexp file))
                 (and (stringp dired-preview-ignored-extensions-regexp)
@@ -798,6 +810,9 @@ with `dired-preview-delay' of idleness."
   "Return a window object for `other-window-scroll-default'."
   (car (dired-preview--get-windows)))
 
+(defvar-local dired-preview--dwim-target-original-value nil
+  "The original value of `dired-dwim-target'.")
+
 (defun dired-preview-disable-preview ()
   "Disable Dired preview."
   (unless (eq major-mode 'dired-mode)
@@ -805,7 +820,7 @@ with `dired-preview-delay' of idleness."
   (when (and other-window-scroll-default
              (eq other-window-scroll-default #'dired-preview-get-first-window))
     (setq-local other-window-scroll-default nil))
-  (setq-local dired-dwim-target nil)
+  (setq-local dired-dwim-target dired-preview--dwim-target-original-value)
   (remove-hook 'post-command-hook #'dired-preview-trigger :local)
   (dired-preview--close-previews))
 
@@ -815,6 +830,7 @@ with `dired-preview-delay' of idleness."
     (user-error "Can only use `dired-preview' in Dired"))
   (when (>= emacs-major-version 29)
     (setq-local other-window-scroll-default #'dired-preview-get-first-window))
+  (setq-local dired-preview--dwim-target-original-value dired-dwim-target)
   (setq-local dired-dwim-target #'dired-preview-get-future-history)
   (add-hook 'post-command-hook #'dired-preview-trigger nil :local)
   (dired-preview-trigger :no-delay))

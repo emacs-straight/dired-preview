@@ -398,7 +398,7 @@ Contributions to code or the manual
 Ideas and/or user feedback
      Alex Popescu, Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter
      Prevos, Ramon Diaz-Uriarte, Yiyu Zhou, abdulnafe-t, artelse,
-     dasoju, fab6, Inkbottle00.
+     dasoju, fab6, Inkbottle00, qhga.
 
 
 File: dired-preview.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
@@ -974,11 +974,11 @@ Node: Do-It-Yourself extensions11264
 Node: The dired-preview-with-window macro11654
 Node: Combine dired-preview with ready-player12282
 Node: Acknowledgements14363
-Node: GNU Free Documentation License15055
-Node: Indices40201
-Node: Function index40381
-Node: Variable index41960
-Node: Concept index43199
+Node: GNU Free Documentation License15061
+Node: Indices40207
+Node: Function index40387
+Node: Variable index41966
+Node: Concept index43205
 
 End Tag Table
 
