@@ -1,11 +1,11 @@
-;;; dired-preview.el --- Automatically preview file at point in Dired -*- lexical-binding: t -*-
+;;; dired-preview.el --- Automatically preview files in Dired -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023-2026  Free Software Foundation, Inc.
 
 ;; Author: Protesilaos <info@protesilaos.com>
 ;; Maintainer: Protesilaos <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/dired-preview
-;; Version: 0.6.2
+;; Version: 0.7.0
 ;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: files, convenience
 
@@ -40,9 +40,9 @@
 ;; Previews are shown subject to a small delay, per ther user option
 ;; `dired-preview-delay'.
 ;;
-;; Files matching the `dired-preview-ignored-extensions-regexp' are
-;; not previewed, though a preview window is still displayed if the
-;; user option `dired-preview-ignored-show-ignored-placeholders' is
+;; Files matching the `dired-preview-ignored-extensions' are not
+;; previewed, though a preview window is still displayed if the user
+;; option `dired-preview-ignored-show-ignored-placeholders' is
 ;; non-nil.  This is to avoid windows jumping in and out of focus as
 ;; the user moves between files.
 ;;
@@ -51,7 +51,7 @@
 ;;
 ;; I took inspiration for `dired-preview' from the now unmaintained
 ;; `peep-dired' package by Adam Sokolnicki: <https://github.com/asok/peep-dired>.
-;; My original plan was to volunteer to maintain `peep-dired` but I
+;; My original plan was to volunteer to maintain `peep-dired' but I
 ;; decided to write it my own way: it was easier for me, plus I can
 ;; implement only what I consider necessary without upsetting existing
 ;; users.
@@ -65,42 +65,83 @@
   (require 'subr-x))
 
 (defgroup dired-preview nil
-  "Automatically preview file at point in Dired."
+  "Automatically preview files in Dired."
   :group 'dired)
 
-(defcustom dired-preview-ignored-extensions-regexp
-  (concat "\\."
-          "\\(mkv\\|webm\\|mp4\\|mp3\\|ogg\\|m4a\\|flac\\|wav"
-          "\\|gz\\|zst\\|tar\\|xz\\|rar\\|zip"
-          "\\|iso\\|epub\\|pdf\\)\\'")
-  "Regular expression of file type extensions to not preview.
-When the value is nil, do not ignore any file: preview
-everything.
+(define-obsolete-variable-alias
+  'dired-preview-ignored-extensions-regexp
+  'dired-preview-ignored-extensions
+  "0.7.0")
 
-A placeholder window will be displayed even for files that are ignored,
-in order to avoid windows jumping in and out of focus.  This behaviour
-is controlled by the `dired-preview-ignored-show-ignored-placeholders'
-user option."
+(defcustom dired-preview-ignored-extensions
+  '("mkv" "webm" "mp4"
+    "mp3" "ogg" "m4a" "flac" "wav"
+    "gz" "zst" "tar" "xz" "rar" "zip" "iso"
+    "epub" "pdf"
+    ".DS_Store")
+  "File extensions to ignore.
+
+The value can be any of the following:
+
+- nil, which means to not ignore anything.
+
+- A regular expression of file type extensions to ignore.
+
+- A list of strings, representing file type extenstions.  Each of these
+  extensions is checked for equality against the return value of
+  `file-name-extension' without its PERIOD argument.
+
+A placeholder window is displayed for files that are ignored, in order
+to avoid windows jumping in and out of focus.  This behaviour is
+controlled by the `dired-preview-ignored-show-ignored-placeholders' user
+option."
   :group 'dired-preview
-  :type '(choice (const :tag "Do not ignore any file (preview everything)" nil)
-                 (string :tag "Ignore files matching regular expression")))
+  :package-version '(dired-preview . "0.7.0")
+  :type '(choice
+          (const :tag "Do not ignore any file (preview everything)" nil)
+          (string :tag "Ignore files matching regular expression")
+          (repeat :tag "Ignore file extension that is a member of this list" string)))
+
+(define-obsolete-variable-alias
+  'dired-preview-image-extensions-regexp
+  'dired-preview-image-extensions
+  "0.7.0")
+
+(defvar dired-preview-image-extensions
+  '("png" "jpg" "jpeg" "tiff")
+  "Like `dired-preview-ignored-extensions' for image files.")
+
+(define-obsolete-variable-alias
+  'dired-preview-media-extensions-regexp
+  'dired-preview-media-extensions
+  "0.7.0")
+
+(defvar dired-preview-media-extensions
+  '("mp3" "m4a" "flac" "ogg"
+    "mp4" "mpv" "webm" "mov" "wav")
+  "Like `dired-preview-ignored-extensions' for multimedia files.")
+
+(define-obsolete-variable-alias
+  'dired-preview-encryption-file-extensions
+  'dired-preview-encryption-extensions
+  "0.7.0")
+
+(defvar dired-preview-encryption-extensions
+  '("gpg" "age")
+  "Like `dired-preview-ignored-extensions' for encrypted files.")
 
 (defcustom dired-preview-ignored-show-ignored-placeholders t
   "When non-nil, show a placeholder preview buffer for ignored files.
-Ignored files are controlled by the `dired-preview-ignored-extensions-regexp'
+Ignored files are controlled by the `dired-preview-ignored-extensions'
 user option."
   :type 'boolean
   :package-version '(dired-preview . "0.3.0")
   :group 'dired-preview)
 
-(defcustom  dired-preview-image-extensions-regexp "\\.\\(png\\|jpg\\|jpeg\\|tiff\\)"
-  "List of file extensions representing image types."
-  :group 'dired-preview
-  :type '(string :tag "Image files matching regular expression"))
-
 (defcustom dired-preview-max-size (expt 2 20)
   "Files larger than this byte limit are not previewed."
   :group 'dired-preview
+  :package-version '(dired-preview . "0.1.0")
   :type 'natnum)
 
 (defcustom dired-preview-kill-buffers-method (cons 'buffer-number 10)
@@ -121,9 +162,11 @@ Whatever the SYMBOL, buffers are killed from oldest to newest.
 
 Buffers are always killed when exiting Dired."
   :type '(choice
-          (cons (choice (const :tag "Maximum number of buffers" buffer-number)
-                        (const :tag "Maximum cumulative buffer size" combined-size))
-                natnum)
+          (cons
+           (choice
+            (const :tag "Maximum number of buffers" buffer-number)
+            (const :tag "Maximum cumulative buffer size" combined-size))
+           natnum)
           (const :tag "Do not kill any preview buffers" nil))
   :package-version '(dired-preview . "0.4.0")
   :group 'dired-preview)
@@ -178,11 +221,13 @@ times the height of the frame."
 If the value is 0, then it is internally understood as 0.1 as no delay
 can affect performance."
   :group 'dired-preview
+  :package-version '(dired-preview . "0.1.0")
   :type 'number)
 
 (defcustom dired-preview-chunk-size 10240
   "Size in bytes to read from large files."
   :group 'dired-preview
+  :package-version '(dired-preview . "0.1.0")
   :type 'natnum)
 
 (defcustom dired-preview-buffer-name-indicator "[P]"
@@ -269,6 +314,10 @@ in the `dired-preview-with-window' macro."
       (setq size (+ (buffer-size buffer) size)))
     size))
 
+(defun dired-preview--kill-buffer (buffer)
+  "Kill BUFFER while ignoring errors."
+  (ignore-errors (kill-buffer buffer)))
+
 (defun dired-preview--kill-buffers-by-size (buffers max-combined-size)
   "Kill BUFFERS to not exceed MAX-COMBINED-SIZE."
   (catch 'enough
@@ -276,7 +325,7 @@ in the `dired-preview-with-window' macro."
       (if (>= (dired-preview--get-buffer-cumulative-size buffers) max-combined-size)
           (if (eq buffer (current-buffer))
               (setq buffers (delq buffer buffers))
-            (ignore-errors (kill-buffer-if-not-modified buffer)))
+            (dired-preview--kill-buffer buffer))
         (throw 'enough t))))
   (setq dired-preview--buffers (delq nil (nreverse buffers))))
 
@@ -289,7 +338,7 @@ in the `dired-preview-with-window' macro."
             (progn
               (if (eq buffer (current-buffer))
                   (setq buffers (delq buffer buffers))
-                (ignore-errors (kill-buffer-if-not-modified buffer)))
+                (dired-preview--kill-buffer buffer))
               (setq length (1- length)))
           (throw 'enough t)))))
   (setq dired-preview--buffers (delq nil (nreverse buffers))))
@@ -298,7 +347,7 @@ in the `dired-preview-with-window' macro."
   "Kill all BUFFERS except the current one."
   (dolist (buffer buffers)
     (when (not (eq buffer (current-buffer)))
-      (ignore-errors (kill-buffer-if-not-modified buffer)))
+      (dired-preview--kill-buffer buffer))
     (setq buffers (delq buffer buffers)))
   (setq dired-preview--buffers (delq nil (nreverse buffers))))
 
@@ -328,13 +377,13 @@ aforementioned user option."
 (defun dired-preview--kill-placeholder-buffers ()
   "Kill all placeholder preview buffers."
   (setq dired-preview--buffers
-        (seq-remove (lambda (buffer)
-                      (with-current-buffer buffer
-                        (when (and (boundp 'dired-preview--placeholder-buffer-p)
-                                   dired-preview--placeholder-buffer-p)
-                          (ignore-errors (kill-buffer buffer))
-                          t)))
-                    (dired-preview--get-buffers))))
+        (seq-remove
+         (lambda (buffer)
+           (with-current-buffer buffer
+             (and (boundp 'dired-preview--placeholder-buffer-p)
+                  dired-preview--placeholder-buffer-p
+                  (dired-preview--kill-buffer buffer))))
+         (dired-preview--get-buffers))))
 
 (defun dired-preview--window-parameter-p (window)
   "Return non-nil if WINDOW has `dired-preview-window' parameter."
@@ -348,24 +397,44 @@ aforementioned user option."
   "Delete preview windows or clean them up if they should not be deleted."
   (dolist (window (dired-preview--get-windows))
     (if (and (not (one-window-p))
-               (window-live-p window)
-               (not (eq window (minibuffer-window)))
-               (not (window-prev-buffers window)))
+             (window-live-p window)
+             (not (eq window (minibuffer-window)))
+             (not (window-prev-buffers window)))
         (delete-window window)
       (dired-preview--clean-up-window window))))
 
+(defun dired-preview--file-matches-kind-p (file kind)
+  "Return non-nil if FILE matches KIND.
+FILE is a string while KIND is the value of a variable like
+`dired-preview-ignored-extensions'."
+  (when (not (file-directory-p file))
+    (let ((file-no-dir (file-name-nondirectory file)))
+      (cond
+       ((stringp kind)
+        (string-match-p kind file-no-dir))
+       ((listp kind)
+        (member (or (file-name-extension file) file-no-dir) kind))))))
+
 (defun dired-preview--file-ignored-p (file)
   "Return non-nil if FILE extension is among the ignored extensions.
-See user option `dired-preview-ignored-extensions-regexp'."
-  (when-let* (((stringp dired-preview-ignored-extensions-regexp))
-              ((not (file-directory-p file)))
-              (file-nondir (file-name-nondirectory file)))
-    (string-match-p dired-preview-ignored-extensions-regexp file-nondir)))
+See user option `dired-preview-ignored-extensions'."
+  (dired-preview--file-matches-kind-p file dired-preview-ignored-extensions))
+
+(defun dired-preview--file-image-p (file)
+  "Return non-nil if FILE is `dired-preview-image-extensions'."
+  (dired-preview--file-matches-kind-p file dired-preview-image-extensions))
+
+(defun dired-preview--file-media-p (file)
+  "Return non-nil if FILE is `dired-preview-media-extensions'."
+  (dired-preview--file-matches-kind-p file dired-preview-media-extensions))
+
+(defun dired-preview--file-encrypted-p (file)
+  "Return non-nil if FILE is encrypted."
+  (dired-preview--file-matches-kind-p file dired-preview-encryption-extensions))
 
 (defun dired-preview--file-large-p (file)
   "Return non-nil if FILE exceeds `dired-preview-max-size'."
-  (>= (or (file-attribute-size (file-attributes file))
-          0)
+  (>= (or (file-attribute-size (file-attributes file)) 0)
       dired-preview-max-size))
 
 (defun dired-preview--file-displayed-p (file)
@@ -377,26 +446,23 @@ See user option `dired-preview-ignored-extensions-regexp'."
 (defun dired-preview--set-window-parameters (window value)
   "Set desired WINDOW parameters to VALUE."
   (with-selected-window window
-    (set-window-parameter window 'dired-preview-window value)
-    (set-window-parameter window 'dedicated value)
-    (set-window-parameter window 'no-other-window value)))
+    (dolist (parameter '(dired-preview-window dedicated no-other))
+      (set-window-parameter window parameter value))))
 
 (defun dired-preview--clean-up-window (&optional window)
   "Remove preview state from WINDOW or `selected-window'."
   (let* ((w (or window (selected-window)))
-        (buffer (window-buffer w)))
+         (buffer (window-buffer w)))
     (dired-preview--rename-buffer (window-buffer w) :make-public)
     (setq dired-preview--buffers (delq buffer dired-preview--buffers))
     (dired-preview--set-window-parameters w nil)
     (remove-hook 'post-command-hook #'dired-preview--clean-up-window :local)))
 
-;; TODO 2024-04-22: Add PDF type and concomitant method to display its buffer.
 (defun dired-preview--infer-type (file)
   "Infer what type FILE is.
 Return a cons cell whose `car' is a symbol describing FILE and `cdr' is
 FILE."
-  (let* ((file (expand-file-name file))
-         (file-nondir (file-name-nondirectory file)))
+  (let ((file (expand-file-name file)))
     (cond
      ((dired-preview--file-ignored-p file)
       (cons 'ignore file))
@@ -404,8 +470,8 @@ FILE."
       (cons 'directory file))
      ((dired-preview--file-large-p file)
       (cons 'large file))
-     ((and (stringp dired-preview-image-extensions-regexp)
-           (string-match-p dired-preview-image-extensions-regexp file-nondir))
+     ;; TODO 2026-09-18: Extend this to `dired-preview--file-media-p'.
+     ((dired-preview--file-image-p file)
       (cons 'image file))
      (t
       (cons 'text file)))))
@@ -430,15 +496,7 @@ FILE."
 (cl-defmethod dired-preview--get-buffer (file)
   "Get a generic preview buffer for FILE."
   (dired-preview-with-file-setup
-   (find-file-noselect file :nowarn)))
-
-(defun dired-preview--add-truncation-message ()
-  "Add a message indicating that the previewed file is truncated."
-  (let* ((max (point-max))
-         (end-ov (make-overlay (1- max) max)))
-    (overlay-put
-     end-ov 'display
-     (propertize "\n--PREVIEW TRUNCATED--" 'face 'shadow))))
+    (find-file-noselect file :nowarn)))
 
 ;;;###autoload
 (defmacro dired-preview-with-window (&rest body)
@@ -450,6 +508,20 @@ FILE."
            ,@body))
      (user-error "No dired-preview window available")))
 
+(defun dired-preview--get-large-file-from-its-buffer (buffer)
+  "Return file of BUFFER among `dired-preview--large-files-alist'."
+  (when-let* ((found (seq-find
+                      (lambda (pair)
+                        (eq (cdr pair) buffer))
+                      dired-preview--large-files-alist)))
+    (car found)))
+
+(defun dired-preview--get-file-or-directory (buffer)
+  "Return file or directory from inside a preview window BUFFER."
+  (or buffer-file-name
+      (dired-preview--get-large-file-from-its-buffer buffer)
+      default-directory))
+
 (defun dired-preview-find-file ()
   "Visit the currently previewed buffer with `find-file'.
 This means that the buffer is no longer among the previews.
@@ -459,14 +531,10 @@ Also see `dired-preview-open-dwim'."
   (let ((file nil)
         (buffer nil))
     (dired-preview-with-window
-      (setq file buffer-file-name)
+      (setq file (dired-preview--get-file-or-directory (current-buffer)))
       (dired-preview--close-previews-outside-dired)
       (setq buffer (find-file-noselect file)))
     (pop-to-buffer buffer)))
-
-(defvar dired-preview-media-extensions-regexp
-  "\\.\\(mp3\\|m4a\\|flac\\|mp4\\|ogg\\|mpv\\|webm\\|mov\\|wav\\)"
-  "Regular expression matching media file extensions.")
 
 (declare-function w32-shell-execute "w32fns.c")
 
@@ -497,34 +565,22 @@ Also see `dired-preview-open-dwim'."
         (start-process (concat command " " file) nil command file)))
     (error "Cannot find a command to open `%s' externally" file)))
 
-(defun dired-preview--get-large-file-from-its-buffer (buffer)
-  "Return file of BUFFER among `dired-preview--large-files-alist'."
-  (seq-find
-   (lambda (pair)
-     (eq (cdr pair) buffer))
-   dired-preview--large-files-alist))
-
 (defun dired-preview-open-dwim ()
   "Do-What-I-Mean open the currently previewed file.
 This means that the buffer is no longer among the previews.
 
-If the file name matches `dired-preview-media-extensions-regexp',
-`dired-preview-ignored-extensions-regexp', or
-`dired-preview-image-extensions-regexp', then open it externally.
-Otherwise, visit the file in an Emacs buffer.
+If the file name matches `dired-preview-ignored-extensions',
+`dired-preview-media-extensions', or `dired-preview-image-extensions',
+then open it externally.  Otherwise, visit the file in an Emacs buffer.
 
 Also see `dired-preview-find-file'."
   (interactive)
   (let ((buffer nil))
     (dired-preview-with-window
-      (when-let* ((file (or buffer-file-name
-                            (dired-preview--get-large-file-from-its-buffer (current-buffer)))))
-        (if (or (and (stringp dired-preview-media-extensions-regexp)
-                     (string-match-p dired-preview-media-extensions-regexp file))
-                (and (stringp dired-preview-ignored-extensions-regexp)
-                     (string-match-p dired-preview-ignored-extensions-regexp file))
-                (and (stringp dired-preview-image-extensions-regexp)
-                     (string-match-p dired-preview-image-extensions-regexp file)))
+      (when-let* ((file (dired-preview--get-file-or-directory (current-buffer))))
+        (if (or (dired-preview--file-ignored-p file)
+                (dired-preview--file-media-p file)
+                (dired-preview--file-image-p file))
             (dired-preview--open-externally file)
           (dired-preview--close-previews-outside-dired)
           (setq buffer (find-file-noselect file)))))
@@ -565,6 +621,14 @@ This technically runs `scroll-down-command'."
 (declare-function hexl-mode-exit "hexl" (&optional arg))
 (defvar hexl-follow-ascii)
 
+(defun dired-preview--add-truncation-message ()
+  "Add a message indicating that the previewed file is truncated."
+  (let* ((max (point-max))
+         (end-ov (make-overlay (1- max) max)))
+    (overlay-put
+     end-ov 'display
+     (propertize "\n--PREVIEW TRUNCATED--" 'face 'shadow))))
+
 (defun dired-preview-hexl-toggle ()
   "Toggle preview between text and `hexl-mode'."
   (interactive)
@@ -580,22 +644,22 @@ This technically runs `scroll-down-command'."
 The size of the leading chunk is specified by
 `dired-preview-chunk-size'."
   (dired-preview-with-file-setup
-   (if-let* ((buffer (or (get-file-buffer file)
-                         (find-buffer-visiting file)
-                         (alist-get file dired-preview--large-files-alist nil nil #'equal))))
-       buffer ; Buffer is already being visited, we can reuse it
-     (with-current-buffer (create-file-buffer file)
-       ;; We create a buffer with a partial preview
-       (buffer-disable-undo)
-       (insert-file-contents file nil 1 dired-preview-chunk-size 'replace)
-       (when (eq buffer-file-coding-system 'no-conversion)
-         (let ((hexl-follow-ascii nil))
-           (hexl-mode 1)))
-       (dired-preview--add-truncation-message)
-       (read-only-mode t)
-       ;; Because this buffer is not marked as visiting FILE, we need to keep
-       ;; track of it ourselves.
-       (setf (alist-get file dired-preview--large-files-alist nil nil 'equal) (current-buffer))))))
+    (if-let* ((buffer (or (get-file-buffer file)
+                          (find-buffer-visiting file)
+                          (alist-get file dired-preview--large-files-alist nil nil #'equal))))
+        buffer ; Buffer is already being visited, we can reuse it
+      (with-current-buffer (create-file-buffer file)
+        ;; We create a buffer with a partial preview
+        (buffer-disable-undo)
+        (insert-file-contents file nil 1 dired-preview-chunk-size 'replace)
+        (when (eq buffer-file-coding-system 'no-conversion)
+          (let ((hexl-follow-ascii nil))
+            (hexl-mode 1)))
+        (dired-preview--add-truncation-message)
+        (read-only-mode t)
+        ;; Because this buffer is not marked as visiting FILE, we need to keep
+        ;; track of it ourselves.
+        (setf (alist-get file dired-preview--large-files-alist nil nil 'equal) (current-buffer))))))
 
 (cl-defmethod dired-preview--get-buffer ((file (head ignore)))
   "Get preview placeholder buffer for an ignored FILE."
@@ -610,14 +674,16 @@ The size of the leading chunk is specified by
           (setq buffer-read-only t)
           (current-buffer)))))
 
+;; TODO 2026-09-18: Add `dired-preview--get-buffer' for images, PDFs,
+;; videos, and anything else.  Those would probably require something
+;; external to Emacs.  For example, we generate a thumbnail of a video
+;; and display that.  I need to learn how to do this sort of thing on
+;; the command-line.
 (cl-defmethod dired-preview--get-buffer ((file (head directory)))
   "Get preview buffer for directory FILE type."
   (dired-preview-with-file-setup
-   (dired-noselect file)))
+    (dired-noselect file)))
 
-;; FIXME 2024-04-22: Best way to preview images and PDF files?  For now
-;; this is the same as the text file type, though we need to refine
-;; it.
 (defun dired-preview--add-to-previews (file)
   "Add FILE to `dired-preview--buffers', if not already in a buffer.
 Return FILE buffer or nil."
@@ -639,9 +705,6 @@ Return FILE buffer or nil."
   "Return buffer to preview FILE in."
   (dired-preview--add-to-previews file))
 
-(defvar dired-preview-buffer-name "*dired-preview*"
-  "Name of preview buffer.")
-
 (defun dired-preview-get-window-size (dimension)
   "Return window size by checking for DIMENSION.
 DIMENSION is either a `:width' or `:height' keyword.  It is
@@ -658,8 +721,9 @@ checked against `split-width-threshold' or
   "Pick a side window that is appropriate for the given frame."
   (if-let* (split-width-threshold
             (width (window-body-width))
-            ((>= width (window-body-height)))
-            ((>= width split-width-threshold)))
+            (height (window-body-height))
+            (_ (>= width height))
+            (_ (>= width split-width-threshold)))
       `(:side right :dimension window-width :size ,(dired-preview-get-window-size :width))
     `(:side bottom :dimension window-height :size ,(dired-preview-get-window-size :height))))
 
@@ -751,16 +815,6 @@ With optional MAKE-PUBLIC, remove the indicator."
     (when-let* ((window (get-buffer-window buffer)))
       (dired-preview--set-window-parameters window t)
       (run-hooks 'dired-preview-hook))))
-
-(defvar dired-preview-encryption-file-extensions '(".gpg" ".age")
-  "List of strings specifying file extensions for encryption.")
-
-(defun dired-preview--file-encrypted-p (file)
-  "Return non-nil if FILE is encrypted.
-More specifically, test if FILE has an extension among the
-`dired-preview-encryption-file-extensions'."
-  (when-let* ((extension (file-name-extension file :include-period)))
-    (member extension dired-preview-encryption-file-extensions)))
 
 (defun dired-preview--preview-p (file)
   "Return non-nil if FILE can be previewed."

@@ -43,11 +43,11 @@ customization options of ‘dired-preview’ (or ‘dired-preview.el’)
 package, and provides every other piece of information pertinent to it.
 
    The documentation furnished herein corresponds to stable version
-0.6.0, released on 2025-07-18.  Any reference to a newer feature which
+0.7.0, released on 2026-09-18.  Any reference to a newer feature which
 does not yet form part of the latest tagged Git commit, is explicitly
 marked as such.
 
-   Current development target is 0.7.0-dev.
+   Current development target is 0.8.0-dev.
 
    • Package name (GNU ELPA): ‘dired-preview’
    • Official manual: <https://protesilaos.com/emacs/dired-preview>
@@ -120,11 +120,20 @@ user option ‘dired-preview-trigger-on-start’ is set to a non-nil value
    Other than entering a directory, a preview happens after one of the
 commands in ‘dired-preview-trigger-commands’ is invoked.
 
-   Files matching the ‘dired-preview-ignored-extensions-regexp’ are not
+   Files matching the ‘dired-preview-ignored-extensions’ are not
 previewed, though a preview window is still displayed if the user option
 ‘dired-preview-ignored-show-ignored-placeholders’ is non-nil.  This is
 to avoid windows jumping in and out of focus as the user moves between
 files.
+
+   The ‘dired-preview-ignored-extensions’ can be set to the following
+values:
+
+   • ‘nil’, which means that all files are previewed.
+   • A regular expression which is matched against the file name.
+   • A list of strings, representing file type extensions, which are
+     matched for equality with the return value of ‘file-name-extension’
+     without its ‘PERIOD’ argument.
 
    Preview buffers have a prefix to their name to make them stand out.
 This is controlled by the user option
@@ -171,7 +180,7 @@ The ‘dired-preview-mode’ and its global variant activate the
      Do-What-I-Mean open the currently previewed file.  This means that
      the buffer is no longer among the previews.  If the file name
      matches ‘dired-preview-media-extensions-regexp’,
-     ‘dired-preview-ignored-extensions-regexp’, or
+     ‘dired-preview-ignored-extensions’, or
      ‘dired-preview-image-extensions-regexp’, then open it externally.
      Otherwise, visit the file in an Emacs buffer.
 
@@ -931,15 +940,15 @@ File: dired-preview.info,  Node: Variable index,  Next: Concept index,  Prev: Fu
  [index ]
 * Menu:
 
-* dired-preview-buffer-name-indicator:   Overview.             (line 34)
+* dired-preview-buffer-name-indicator:   Overview.             (line 43)
 * dired-preview-delay:                   Overview.             (line 15)
 * dired-preview-display-action-alist:    How to tweak the placement of the preview window.
                                                                (line  6)
-* dired-preview-ignored-extensions-regexp: Overview.           (line 28)
+* dired-preview-ignored-extensions:      Overview.             (line 28)
 * dired-preview-ignored-show-ignored-placeholders: Overview.   (line 28)
 * dired-preview-image-extensions-regexp: The commands available in the preview window.
                                                                (line 13)
-* dired-preview-kill-buffers-method:     Overview.             (line 38)
+* dired-preview-kill-buffers-method:     Overview.             (line 47)
 * dired-preview-max-size:                Overview.             (line 15)
 * dired-preview-media-extensions-regexp: The commands available in the preview window.
                                                                (line 13)
@@ -964,21 +973,21 @@ File: dired-preview.info,  Node: Concept index,  Prev: Variable index,  Up: Indi
 Tag Table:
 Node: Top867
 Node: Overview3154
-Node: The commands available in the preview window5881
-Node: How to tweak the placement of the preview window7101
-Node: Installation8833
-Node: GNU ELPA package9024
-Node: Manual installation9596
-Node: Sample configuration10397
-Node: Do-It-Yourself extensions11264
-Node: The dired-preview-with-window macro11654
-Node: Combine dired-preview with ready-player12282
-Node: Acknowledgements14363
-Node: GNU Free Documentation License15061
-Node: Indices40207
-Node: Function index40387
-Node: Variable index41966
-Node: Concept index43205
+Node: The commands available in the preview window6274
+Node: How to tweak the placement of the preview window7487
+Node: Installation9219
+Node: GNU ELPA package9410
+Node: Manual installation9982
+Node: Sample configuration10783
+Node: Do-It-Yourself extensions11650
+Node: The dired-preview-with-window macro12040
+Node: Combine dired-preview with ready-player12668
+Node: Acknowledgements14749
+Node: GNU Free Documentation License15447
+Node: Indices40593
+Node: Function index40773
+Node: Variable index42352
+Node: Concept index43591
 
 End Tag Table
 
