@@ -20,7 +20,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: dired-preview.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: dired-preview.info,  Node: Top,  Next: Installation,  Up: (dir)
 
 dired-preview.el: automatically preview files in Dired
 ******************************************************
@@ -60,9 +60,9 @@ marked as such.
 
 * Menu:
 
-* Overview::
 * Installation::
 * Sample configuration::
+* Overview::
 * Do-It-Yourself extensions::
 * Acknowledgements::
 * GNU Free Documentation License::
@@ -70,15 +70,15 @@ marked as such.
 
 -- The Detailed Node Listing --
 
-Overview
-
-* The commands available in the preview window::
-* How to tweak the placement of the preview window::
-
 Installation
 
 * GNU ELPA package::
 * Manual installation::
+
+Overview
+
+* The commands available in the preview window::
+* How to tweak the placement of the preview window::
 
 Do-It-Yourself extensions
 
@@ -93,9 +93,90 @@ Indices
 
 
 
-File: dired-preview.info,  Node: Overview,  Next: Installation,  Prev: Top,  Up: Top
+File: dired-preview.info,  Node: Installation,  Next: Sample configuration,  Prev: Top,  Up: Top
 
-1 Overview
+1 Installation
+**************
+
+* Menu:
+
+* GNU ELPA package::
+* Manual installation::
+
+
+File: dired-preview.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
+
+1.1 GNU ELPA package
+====================
+
+The package is available as ‘dired-preview’.  Simply do:
+
+     M-x package-refresh-contents
+     M-x package-install
+
+   And search for it.
+
+   GNU ELPA provides the latest stable release.  Those who prefer to
+follow the development process in order to report bugs or suggest
+changes, can use the version of the package from the GNU-devel ELPA
+archive.  Read:
+<https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
+
+
+File: dired-preview.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
+
+1.2 Manual installation
+=======================
+
+Assuming your Emacs files are found in ‘~/.emacs.d/’, execute the
+following commands in a shell prompt:
+
+     cd ~/.emacs.d
+
+     # Create a directory for manually-installed packages
+     mkdir manual-packages
+
+     # Go to the new directory
+     cd manual-packages
+
+     # Clone this repo, naming it "dired-preview"
+     git clone https://github.com/protesilaos/dired-preview dired-preview
+
+   Finally, in your ‘init.el’ (or equivalent) evaluate this:
+
+     ;; Make Elisp files in that directory available to the user.
+     (add-to-list 'load-path "~/.emacs.d/manual-packages/dired-preview")
+
+   Everything is in place to set up the package.
+
+
+File: dired-preview.info,  Node: Sample configuration,  Next: Overview,  Prev: Installation,  Up: Top
+
+2 Sample configuration
+**********************
+
+Remember to read the docstring of each of these variables or functions.
+
+     (use-package dired-preview
+       :ensure t
+       :config
+       ;; Default values for demo purposes
+       (setq dired-preview-delay 0.7)
+       (setq dired-preview-max-size (expt 2 20))
+       (setq dired-preview-ignored-extensions
+             '("mkv" "webm" "mp4"
+               "mp3" "ogg" "m4a" "flac" "wav"
+               "gz" "zst" "tar" "xz" "rar" "zip" "iso"
+               "epub" "pdf"
+               ".DS_Store"))
+       ;; Enable `dired-preview-mode' in a given Dired buffer or do it
+       ;; globally like this:
+       (dired-preview-global-mode 1))
+
+
+File: dired-preview.info,  Node: Overview,  Next: Do-It-Yourself extensions,  Prev: Sample configuration,  Up: Top
+
+3 Overview
 **********
 
 This is a simple and robust package to automatically preview in a side
@@ -151,6 +232,11 @@ type without affecting the performance of Emacs.  ]
    Large files are previewed in ‘hexl-mode’ mode.  The user can disable
 this mode by typing ‘C-c C-c’.
 
+   By default the preview window does not evaluate any local variables.
+The user option ‘dired-preview-enable-local-variables’ can be set to ‘t’
+to change this behaviour.  [ The ‘dired-preview-enable-local-variables’
+is part of 0.8.0-dev.  ]
+
    I took inspiration for ‘dired-preview’ from the now unmaintained
 ‘peep-dired’ package by Adam Sokolnicki:
 <https://github.com/asok/peep-dired>.  My original plan was to volunteer
@@ -166,7 +252,7 @@ without upsetting existing users.
 
 File: dired-preview.info,  Node: The commands available in the preview window,  Next: How to tweak the placement of the preview window,  Up: Overview
 
-1.1 The commands available in the preview window
+3.1 The commands available in the preview window
 ================================================
 
 The ‘dired-preview-mode’ and its global variant activate the
@@ -196,7 +282,7 @@ The ‘dired-preview-mode’ and its global variant activate the
 
 File: dired-preview.info,  Node: How to tweak the placement of the preview window,  Prev: The commands available in the preview window,  Up: Overview
 
-1.2 How to tweak the placement of the preview window
+3.2 How to tweak the placement of the preview window
 ====================================================
 
 The user option ‘dired-preview-display-action-alist’ speficies a
@@ -233,93 +319,7 @@ users' needs:
      window's height to 0.3 times the height of the frame.
 
 
-File: dired-preview.info,  Node: Installation,  Next: Sample configuration,  Prev: Overview,  Up: Top
-
-2 Installation
-**************
-
-* Menu:
-
-* GNU ELPA package::
-* Manual installation::
-
-
-File: dired-preview.info,  Node: GNU ELPA package,  Next: Manual installation,  Up: Installation
-
-2.1 GNU ELPA package
-====================
-
-The package is available as ‘dired-preview’.  Simply do:
-
-     M-x package-refresh-contents
-     M-x package-install
-
-   And search for it.
-
-   GNU ELPA provides the latest stable release.  Those who prefer to
-follow the development process in order to report bugs or suggest
-changes, can use the version of the package from the GNU-devel ELPA
-archive.  Read:
-<https://protesilaos.com/codelog/2022-05-13-emacs-elpa-devel/>.
-
-
-File: dired-preview.info,  Node: Manual installation,  Prev: GNU ELPA package,  Up: Installation
-
-2.2 Manual installation
-=======================
-
-Assuming your Emacs files are found in ‘~/.emacs.d/’, execute the
-following commands in a shell prompt:
-
-     cd ~/.emacs.d
-
-     # Create a directory for manually-installed packages
-     mkdir manual-packages
-
-     # Go to the new directory
-     cd manual-packages
-
-     # Clone this repo, naming it "dired-preview"
-     git clone https://github.com/protesilaos/dired-preview dired-preview
-
-   Finally, in your ‘init.el’ (or equivalent) evaluate this:
-
-     ;; Make Elisp files in that directory available to the user.
-     (add-to-list 'load-path "~/.emacs.d/manual-packages/dired-preview")
-
-   Everything is in place to set up the package.
-
-
-File: dired-preview.info,  Node: Sample configuration,  Next: Do-It-Yourself extensions,  Prev: Installation,  Up: Top
-
-3 Sample configuration
-**********************
-
-Remember to read the docstring of each of these variables or functions.
-
-     (require 'dired-preview)
-
-     ;; Default values for demo purposes
-     (setq dired-preview-delay 0.7)
-     (setq dired-preview-max-size (expt 2 20))
-     (setq dired-preview-ignored-extensions-regexp
-             (concat "\\."
-                     "\\(gz\\|"
-                     "zst\\|"
-                     "tar\\|"
-                     "xz\\|"
-                     "rar\\|"
-                     "zip\\|"
-                     "iso\\|"
-                     "epub"
-                     "\\)"))
-
-     ;; Enable `dired-preview-mode' in a given Dired buffer or do it
-     ;; globally:
-     (dired-preview-global-mode 1)
-
-
-File: dired-preview.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Sample configuration,  Up: Top
+File: dired-preview.info,  Node: Do-It-Yourself extensions,  Next: Acknowledgements,  Prev: Overview,  Up: Top
 
 4 Do-It-Yourself extensions
 ***************************
@@ -407,7 +407,7 @@ Contributions to code or the manual
 Ideas and/or user feedback
      Alex Popescu, Bruno Boal, Ed Hamilton, Karthik Chikmagalur, Peter
      Prevos, Ramon Diaz-Uriarte, Yiyu Zhou, abdulnafe-t, artelse,
-     dasoju, fab6, Inkbottle00, qhga.
+     dasoju, fab6, hayatama, Inkbottle00, qhga.
 
 
 File: dired-preview.info,  Node: GNU Free Documentation License,  Next: Indices,  Prev: Acknowledgements,  Up: Top
@@ -944,6 +944,7 @@ File: dired-preview.info,  Node: Variable index,  Next: Concept index,  Prev: Fu
 * dired-preview-delay:                   Overview.             (line 15)
 * dired-preview-display-action-alist:    How to tweak the placement of the preview window.
                                                                (line  6)
+* dired-preview-enable-local-variables:  Overview.             (line 59)
 * dired-preview-ignored-extensions:      Overview.             (line 28)
 * dired-preview-ignored-show-ignored-placeholders: Overview.   (line 28)
 * dired-preview-image-extensions-regexp: The commands available in the preview window.
@@ -972,22 +973,22 @@ File: dired-preview.info,  Node: Concept index,  Prev: Variable index,  Up: Indi
 
 Tag Table:
 Node: Top867
-Node: Overview3154
-Node: The commands available in the preview window6274
-Node: How to tweak the placement of the preview window7487
-Node: Installation9219
-Node: GNU ELPA package9410
-Node: Manual installation9982
-Node: Sample configuration10783
-Node: Do-It-Yourself extensions11650
-Node: The dired-preview-with-window macro12040
-Node: Combine dired-preview with ready-player12668
-Node: Acknowledgements14749
-Node: GNU Free Documentation License15447
-Node: Indices40593
-Node: Function index40773
-Node: Variable index42352
-Node: Concept index43591
+Node: Installation3158
+Node: GNU ELPA package3344
+Node: Manual installation3916
+Node: Sample configuration4717
+Node: Overview5514
+Node: The commands available in the preview window8919
+Node: How to tweak the placement of the preview window10132
+Node: Do-It-Yourself extensions11864
+Node: The dired-preview-with-window macro12242
+Node: Combine dired-preview with ready-player12870
+Node: Acknowledgements14951
+Node: GNU Free Documentation License15659
+Node: Indices40805
+Node: Function index40985
+Node: Variable index42564
+Node: Concept index43876
 
 End Tag Table
 
